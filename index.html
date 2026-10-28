@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colegio Schönthal - Plano Interactivo y Horarios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                fontFamily: { sans: ['Inter', 'sans-serif'] },
+                colors: { brand: { 50:'#f0f9ff', 100:'#e0f2fe', 500:'#0284c7', 600:'#0369a1', 700:'#075985' } }
+            } }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .room { cursor: pointer; transition: opacity .2s; }
+        .room.static { cursor: default; }
+        .room text { pointer-events: none; user-select: none; }
+        .room rect.shape { filter: drop-shadow(0 1px 2px rgba(2,6,23,.45)); }
+        .room.static rect.shape { filter: none; }
+        .room:not(.static):hover rect.shape { filter: brightness(1.4) drop-shadow(0 2px 5px rgba(2,6,23,.55)); }
+        .active-room rect.shape { animation: pulse-border 1.8s infinite; }
+        @keyframes pulse-border { 0%,100% { fill-opacity: 1; } 50% { fill-opacity: .55; } }
+        .now-row td { background: #fffbeb !important; }
+        thead th { position: sticky; top: 0; z-index: 5; }
+    </style>
+</head>
+<body class="h-full text-slate-800 flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="bg-gradient-to-tr from-brand-600 to-indigo-600 text-white p-2.5 rounded-xl shadow-md">
+                        <i class="fa-solid fa-school text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight text-slate-900">Colegio Schönthal</h1>
+                        <p class="text-xs text-slate-500 font-medium">Planos y Distribución Oficial</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center gap-4 text-xs font-medium">
+                    <div class="bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-full flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-amber-500"></i>
+                        <span id="active-floor-text">Ubicación actual: Planta Baja</span>
+                    </div>
+                    <div class="text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                        <i class="fa-regular fa-clock text-slate-400 mr-1.5"></i>
+                        <span id="live-time-display">00:00:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Buscador y filtros -->
+        <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-4">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="relative flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <input type="text" id="search-input" autocomplete="off"
+                        placeholder="Buscar por materia, profesor, curso, día o espacio (ej: Patio de las Palmeras, BIOLOGY LABORATORIO, Lab. Química, Prof. García)..."
+                        class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all">
+                    <button id="clear-search-btn" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-circle-xmark text-sm"></i>
+                    </button>
+                </div>
+                <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
+                    <select id="filter-floor" class="w-full sm:w-auto px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-700 font-medium">
+                        <option value="ALL">Todos los Pisos</option>
+                        <option value="PB">Planta Baja</option>
+                        <option value="1P">Primer Piso</option>
+                        <option value="2P">Segundo Piso</option>
+                    </select>
+                    <select id="filter-type" class="w-full sm:w-auto px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-700 font-medium">
+                        <option value="ALL">Todos los Espacios</option>
+                        <option value="Patio">Patios y Libres</option>
+                        <option value="Aula">Aulas de Clase</option>
+                        <option value="Taller">Talleres, Labs y Especiales</option>
+                    </select>
+                    <select id="filter-day" class="w-full sm:w-auto px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-700 font-medium">
+                        <option value="ALL">Todos los días</option>
+                        <option value="Lunes">Lunes</option>
+                        <option value="Martes">Martes</option>
+                        <option value="Miércoles">Miércoles</option>
+                        <option value="Jueves">Jueves</option>
+                        <option value="Viernes">Viernes</option>
+                    </select>
+                    <button id="reset-filters-btn" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-1.5" title="Restablecer Filtros">
+                        <i class="fa-solid fa-rotate-left text-xs"></i>
+                        <span class="hidden sm:inline">Limpiar</span>
+                    </button>
+                </div>
+            </div>
+            <div id="results-bar" class="hidden flex flex-wrap items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100 gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span>Resultados:</span>
+                    <span id="results-count" class="font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">0 actividades</span>
+                    <span id="results-rooms" class="font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full"></span>
+                </div>
+                <div id="active-tag-container" class="flex flex-wrap gap-1.5"></div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- MAPA -->
+            <section id="map-section" class="lg:col-span-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h2 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-map-location-dot text-brand-500"></i> Plano Arquitectónico Real
+                        </h2>
+                        <p class="text-xs text-slate-500">Clic en un espacio para filtrar sus clases · clic en <strong class="text-amber-600">Escaleras / Ascensor</strong> para cambiar de piso</p>
+                    </div>
+                    <div class="flex items-center gap-2 self-start sm:self-auto">
+                        <div class="inline-flex p-1 bg-slate-100 rounded-xl text-xs font-semibold">
+                            <button id="floor-PB-btn" class="px-2.5 py-1.5 rounded-lg transition-all">Planta Baja <span id="badge-PB" class="hidden ml-1 px-1.5 rounded-full bg-amber-400 text-slate-900 text-[10px]"></span></button>
+                            <button id="floor-1P-btn" class="px-2.5 py-1.5 rounded-lg transition-all">1° Piso <span id="badge-1P" class="hidden ml-1 px-1.5 rounded-full bg-amber-400 text-slate-900 text-[10px]"></span></button>
+                            <button id="floor-2P-btn" class="px-2.5 py-1.5 rounded-lg transition-all">2° Piso <span id="badge-2P" class="hidden ml-1 px-1.5 rounded-full bg-amber-400 text-slate-900 text-[10px]"></span></button>
+                        </div>
+                        <button id="expand-map-btn" class="hidden lg:flex items-center gap-1.5 px-2.5 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-semibold text-slate-700" title="Ampliar / reducir mapa">
+                            <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative bg-slate-900 rounded-xl overflow-hidden border border-slate-800 shadow-inner p-2 flex items-center justify-center">
+                    <div class="absolute top-3 left-3 bg-slate-900/85 backdrop-blur-md px-3 py-1 rounded-lg border border-slate-700 text-[11px] font-bold text-amber-400 z-10 flex items-center gap-2">
+                        <i class="fa-solid fa-stairs"></i> <span id="svg-floor-title">PLANTA BAJA</span>
+                    </div>
+                    <div class="absolute top-3 right-3 bg-slate-900/85 backdrop-blur-md px-2.5 py-1 rounded-lg border border-brand-500/40 text-[10px] font-bold text-brand-300 z-10 flex items-center gap-1.5">
+                        <i class="fa-solid fa-road text-brand-400"></i> <span>▼ Frente Av. Nazca</span>
+                    </div>
+
+                    <svg id="map-svg" class="w-full h-auto" style="max-height: 78vh" viewBox="0 0 1185 1065" xmlns="http://www.w3.org/2000/svg"></svg>
+
+                    <div id="map-room-info" class="hidden absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur-md border border-slate-700 text-white p-3 rounded-xl shadow-lg flex items-center justify-between z-20">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-door-open text-base"></i>
+                            </div>
+                            <div>
+                                <h4 id="info-room-name" class="font-bold text-sm text-slate-100">Aula</h4>
+                                <p id="info-room-desc" class="text-xs text-slate-400"></p>
+                            </div>
+                        </div>
+                        <button id="clear-room-filter-btn" class="text-xs text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg transition-colors border border-slate-700">Ver todo</button>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-xs text-slate-600 pt-1">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-emerald-500/30 border border-emerald-500"></span> Patios / Terraza</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-blue-500/30 border border-blue-500"></span> Aulas</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-cyan-500/30 border border-cyan-500"></span> Computación</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-indigo-500/30 border border-indigo-500"></span> Talleres / Labs</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-purple-500/30 border border-purple-500"></span> Capilla / SUM / Biblioteca</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-amber-500/30 border border-amber-500"></span> Oficinas / Adm.</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-orange-500/30 border border-orange-500"></span> Escaleras / Ascensor</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-slate-500/30 border border-slate-500"></span> Pasillos / Servicios</span>
+                </div>
+            </section>
+
+            <!-- GRILLA -->
+            <section id="grid-section" class="lg:col-span-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h2 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-week text-brand-500"></i> Horarios y Distribución
+                        </h2>
+                        <p class="text-xs text-slate-500">Clic en una clase para ubicarla en el plano</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-[10px] font-semibold">
+                        <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">Patio</span>
+                        <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800">Aula</span>
+                        <span class="px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-800">Taller</span>
+                    </div>
+                </div>
+
+                <div class="overflow-auto custom-scrollbar border border-slate-200 rounded-xl bg-slate-50/50" style="max-height: 78vh">
+                    <table id="schedule-table" class="w-full text-left border-collapse" style="min-width:720px">
+                        <thead id="schedule-thead"></thead>
+                        <tbody id="schedule-tbody" class="divide-y divide-slate-200 text-xs"></tbody>
+                    </table>
+                </div>
+
+                <div id="no-results-state" class="hidden py-10 text-center space-y-3">
+                    <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-xl">
+                        <i class="fa-solid fa-filter-circle-xmark"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-700">Sin actividades registradas</h3>
+                    <p class="text-xs text-slate-500 max-w-sm mx-auto" id="no-results-hint">No existen materias que coincidan con la búsqueda o el filtro seleccionado.</p>
+                    <button id="clear-search-fallback-btn" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-medium text-xs rounded-xl shadow-sm transition-colors">Restablecer todos los filtros</button>
+                </div>
+
+                <p class="text-[11px] text-slate-400 flex items-start gap-1.5">
+                    <i class="fa-solid fa-circle-info mt-0.5"></i>
+                    Los horarios son datos de ejemplo generados por <code class="bg-slate-100 px-1 rounded">buildClasses()</code>. Reemplazalos por los reales editando el arreglo <code class="bg-slate-100 px-1 rounded">CLASSES</code> en el código.
+                </p>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal escaleras -->
+    <div id="stair-modal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2 text-amber-600 font-bold">
+                    <i id="stair-modal-icon" class="fa-solid fa-stairs text-lg"></i>
+                    <h3 id="stair-modal-title" class="text-slate-900 text-base">Escalera</h3>
+                </div>
+                <button id="close-stair-modal-btn" class="text-slate-400 hover:text-slate-600 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-600 font-medium">Seleccioná el piso al que querés ir:</p>
+            <div class="space-y-2 pt-1" id="stair-modal-buttons"></div>
+        </div>
+    </div>
+
+    <!-- Modal clase -->
+    <div id="class-modal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 space-y-5">
+            <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl bg-brand-50 text-brand-600 border border-brand-100 flex items-center justify-center text-xl"><i class="fa-solid fa-book"></i></div>
+                    <div>
+                        <span id="modal-course-badge" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600 uppercase tracking-wider"></span>
+                        <h3 id="modal-subject-title" class="font-bold text-slate-900 text-lg leading-tight mt-0.5"></h3>
+                    </div>
+                </div>
+                <button id="close-modal-btn" class="text-slate-400 hover:text-slate-600 text-xl p-1 rounded-lg hover:bg-slate-100 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3.5 text-sm">
+                <div class="flex items-center gap-3 text-slate-700">
+                    <div class="w-8 text-center text-slate-400"><i class="fa-solid fa-user-tie"></i></div>
+                    <div><p class="text-xs text-slate-400 font-medium">Profesor / Docente</p><p id="modal-teacher" class="font-semibold text-slate-800"></p></div>
+                </div>
+                <div class="flex items-center gap-3 text-slate-700">
+                    <div class="w-8 text-center text-slate-400"><i class="fa-solid fa-location-dot"></i></div>
+                    <div><p class="text-xs text-slate-400 font-medium">Ubicación en Plano</p><p id="modal-room" class="font-semibold text-brand-600"></p></div>
+                </div>
+                <div class="flex items-center gap-3 text-slate-700">
+                    <div class="w-8 text-center text-slate-400"><i class="fa-regular fa-clock"></i></div>
+                    <div><p class="text-xs text-slate-400 font-medium">Día y Horario</p><p id="modal-schedule" class="font-semibold text-slate-800"></p></div>
+                </div>
+            </div>
+            <div class="pt-2 flex gap-3">
+                <button id="locate-on-map-btn" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-crosshairs"></i> Ir al Piso y Marcar en Plano
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+/* =====================================================================
+   UTILIDADES
+===================================================================== */
+const $ = id => document.getElementById(id);
+const norm = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const r = (id, n, x, y, w, h, k, o = {}) => ({ id, n, x, y, w, h, k, ...o });
+
+const FLOOR_ORDER = ['PB', '1P', '2P'];
+const FLOOR_NAME = { PB: 'Planta Baja', '1P': 'Primer Piso', '2P': 'Segundo Piso' };
+
+/* Colores por tipo de espacio (f = relleno plano, s = borde, t = texto,
+   o = opacidad SOLO del relleno — los bordes quedan con su color pleno,
+   d = línea punteada). Los tipos con gradiente definido en
+   GRADS se pintan con url(#gk_<tipo>) en renderMap(): misma familia de
+   color original, con profundidad sutil. */
+const KIND = {
+    aula:   { f:'#1c3050', s:'#5d8cc0', t:'#dbeafe', o:.8 },
+    comp:   { f:'#083344', s:'#22d3ee', t:'#a5f3fc', o:.8 },
+    lab:    { f:'#054430', s:'#34d399', t:'#d1fae5', o:.8 },
+    taller: { f:'#312e81', s:'#9ba3f5', t:'#e0e7ff', o:.8 },
+    esp:    { f:'#4c1d95', s:'#c4a2f8', t:'#f3e8ff' },
+    admin:  { f:'#422006', s:'#f59e0b', t:'#fde68a' },
+    patio:  { f:'#065f46', s:'#34d399', t:'#a7f3d0', o:.4 },
+    serv:   { f:'#111827', s:'#64748b', t:'#b6c2d2' },
+    hall:   { f:'#1e293b', s:'#8fa8c4', t:'#e2e8f0' },
+    circ:   { f:'#16202f', s:'#41546e', t:'#7e93ab', st:true },
+    void:   { f:'#0284c7', s:'#0284c7', t:'#38bdf8', o:.07, d:'8 6', st:true },
+    noedu:  { f:'url(#hatch)', s:'#4b5c76', t:'#94a3b8', d:'8 6', st:true },
+    stair:  { f:'#b23a08', s:'#ffab6b', t:'#fff7ed' },
+    /* tipos del 2º piso ("1 ER PISO HECHO.png") */
+    edfis:  { f:'#f6740a', s:'#ffcf9e', t:'#4a1d03', o:.8 },
+    bio:    { f:'#1ca344', s:'#a4eebb', t:'#0b3d1c', o:.8 },
+    comu:   { f:'#d5141d', s:'#ffb9bd', t:'#ffffff', o:.8 },
+    arte:   { f:'#ffa5c2', s:'#ef6f9d', t:'#701a3c', o:.8 },
+    /* tipos nuevos del 1er piso ("piso 1 de verdad no mames.png") */
+    soc:    { f:'#f7ce00', s:'#d9b400', t:'#3d3200', o:.8 },
+    mate:   { f:'#97409f', s:'#d9a8e2', t:'#2a0a2e', o:.8 },
+    leng:   { f:'#0090d4', s:'#8ad7f8', t:'#04263a', o:.8 }
+};
+/* Gradientes verticales [claro -> oscuro] por tipo: embellece conservando el color original */
+const GRADS = {
+    aula:   ['#2b4a6f', '#1c3050'],
+    comp:   ['#0d5a7a', '#083344'],
+    lab:    ['#0c6b4f', '#054430'],
+    taller: ['#4540a8', '#312e81'],
+    esp:    ['#6d31c4', '#4c1d95'],
+    admin:  ['#6b3a10', '#422006'],
+    patio:  ['#0b7d58', '#065f46'],
+    serv:   ['#1e2939', '#111827'],
+    hall:   ['#2c4260', '#1e293b'],
+    circ:   ['#1d2a42', '#16202f'],
+    stair:  ['#e2600e', '#b23a08'],
+    edfis:  ['#ffa04a', '#f6740a'],
+    bio:    ['#3ecf68', '#1ca344'],
+    comu:   ['#f65a62', '#d5141d'],
+    arte:   ['#ffc9da', '#ffa5c2'],
+    soc:    ['#ffe95e', '#f7ce00'],
+    mate:   ['#b663c9', '#97409f'],
+    leng:   ['#2cb4f2', '#0090d4']
+};
+const SCHED_TYPE = { aula:'Aula', soc:'Aula', mate:'Aula', leng:'Aula', comp:'Taller', lab:'Taller', taller:'Taller', esp:'Taller', patio:'Patio', edfis:'Taller', bio:'Taller', comu:'Taller', arte:'Taller' };
+
+/* =====================================================================
+   PLANOS  (coordenadas tomadas de los 3 planos originales)
+   r(id, nombre, x, y, ancho, alto, tipo, {go:[pisos], tp:'top'})
+===================================================================== */
+const FLOORS = {
+/* ------------------------- PLANTA BAJA ------------------------- */
+PB: {
+    /* "EN PLANTA BAJA PONE ESO": vista del ala este completo (badges inferiores
+       visibles, como en la maqueta) con etiquetas grandes (bs 30).
+       Comedor renombrado Cocodrilo segun la maqueta. */
+    vb: [509, 23, 747, 1000],
+    bs: 30,
+    pre: b => '',
+    post: b => {
+        const badge = (cx, id, c1, c2, txt) => `<g class="room" data-id="${id}"><rect class="shape" x="${cx-80}" y="982" width="160" height="26" rx="6" fill="${c1}" stroke="${c2}" stroke-width="2"/><text x="${cx}" y="1000" text-anchor="middle" fill="#fff" font-size="${b*.55}" font-weight="700">${txt}</text></g>`;
+        return badge(540, 'pb_hall_jardin', '#16a34a', '#4ade80', '🌱 ACCESO JARDÍN') +
+        badge(885, 'pb_hall_entrada', '#7c3aed', '#c084fc', '🎓 ACCESO SECUNDARIA');
+    },
+    rooms: [
+        /* columna este rayada */
+        r('pb_noedu','Uso no educativo',985,20,200,800,'noedu'),
+        r('pb_of_t','Uso no educativo',490,30,28,80,'noedu'),
+        /* ala derecha */
+        r('pb_esc1','Esc. N°1',770,110,65,90,'stair',{go:['1P','2P']}),
+        r('pb_biblio','Biblioteca',855,150,110,95,'esp'),
+        r('pb_galeria_n','Galería',770,262,75,75,'circ'),
+        r('pb_asc','Ascensor',828,312,45,32,'stair',{go:['1P','2P'],lift:true}),
+        r('pb_archivo','Archivo',900,310,75,40,'serv'),
+        r('pb_galeria','Uso no educativo',490,410,360,55,'noedu'),
+        r('pb_dep2','Uso no educativo',495,480,22,85,'noedu'),
+        r('pb_hall_sj','Uso no educativo',522,475,50,95,'noedu'),
+        r('pb_sj5','Uso no educativo',650,475,75,95,'noedu'),
+        r('pb_sj_2a','Uso no educativo',735,475,90,95,'noedu'),
+        r('pb_dep_r','Depósito',905,385,65,25,'serv'),
+        r('pb_circ_r','Pasillos',850,465,50,365,'circ'),
+        r('pb_esc_hall','Esc. Hall',575,480,65,75,'stair',{go:['1P']}),
+        r('pb_comedor','Cocodrilo',905,505,70,60,'esp',{fs:12}),
+        r('pb_circ_mid','Uso no educativo',520,585,45,245,'noedu'),
+        r('pb_patio','Uso no educativo',490,585,30,160,'noedu'),
+        r('pb_noedu_pc','Uso no educativo',570,585,280,160,'noedu'),
+        r('pb_cocina','Cocina',925,655,50,50,'esp'),
+        /* fila trasera y frontal */
+        r('pb_esc2','Esc. N°2',800,752,48,62,'stair',{go:['1P','2P']}),
+        r('pb_hall_acc','Uso no educativo',490,752,115,78,'noedu'),
+        r('pb_capilla','Uso no educativo',610,752,185,78,'noedu'),
+        r('pb_sum','Uso no educativo',910,840,175,135,'noedu'),
+        r('pb_circ_front','Uso no educativo',490,830,405,50,'noedu'),
+        r('pb_port','Uso no educativo',495,890,40,85,'noedu'),
+        r('pb_hall_jardin','Uso no educativo',540,880,55,95,'noedu'),
+        r('pb_of2','Uso no educativo',600,880,65,95,'noedu'),
+        r('pb_of3','Uso no educativo',670,880,70,95,'noedu'),
+        r('pb_office','Uso no educativo',745,880,45,95,'noedu'),
+        r('pb_of4','Uso no educativo',795,880,65,95,'noedu'),
+        r('pb_hall_entrada','Hall Entrada',862,880,45,95,'hall'),
+        /* patio de las palmeras (esquina noroeste del recorte) */
+        r('pb_patio_desc','Patio de las Palmeras',520,30,250,310,'patio')
+    ]
+},
+/* ------------------------- PRIMER PISO ------------------------- */
+'1P': {
+    vb: [1747, 1048],
+    pre: b => `<text x="873" y="1032" text-anchor="middle" fill="#64748b" font-size="${b*.6}" font-weight="700" letter-spacing="3">▼ FRENTE AV. NAZCA</text>`,
+    post: b => '',
+    /* SECCION UNICA DEL 1ER PISO ("piso 1 de verdad no mames.png"): sector
+       Esc. N°1 / Aulas / Sanitarios con la asignacion por materia del usuario
+       (Matematica, Sociales, Lengua, Arte). Re-escalada en X (x'=(x-1187)*3.12)
+       para ocupar TODO el rectangulo; SOCIALES 4A agregada al oeste. */
+    rooms: [
+        /* circulaciones */
+        r('p1_circ_r1','Pasillos',234,430,218,370,'circ'),
+        r('p1_circ_r2','Pasillos',1086,20,140,680,'circ'),
+        r('p1_circ_r3','Pasillos',234,800,992,65,'circ'),
+        r('p1_circ_r4','Pasillos',462,690,624,50,'circ'),
+        /* pasillo nuevo: conecta SOCIALES 2C (este, via circ_r2) con SOCIALES 4A (oeste);
+           toca Esc. N°1 por arriba (y=200) y baja al oeste hasta Esc. N°2 (y=690) */
+        r('p1_circ_h','Pasillos',155,200,931,115,'circ'),
+        r('p1_circ_w','Pasillos',0,315,234,375,'circ'),
+        /* escaleras y ascensor */
+        r('p1_asc','Ascensor',181,20,265,70,'stair',{go:['PB','2P'],lift:true}),
+        r('p1_esc1','Esc. N°1',150,100,296,100,'stair',{go:['PB','2P']}),
+        r('p1_esc2','Esc. N°2',0,690,234,100,'stair',{go:['PB','2P']}),
+        /* informatica y gabinete */
+        r('p1_a109','COMPUTACION LUCAS',477,20,468,160,'comp'),
+        r('p1_gab','Gabinete',961,125,119,50,'admin'),
+        /* columna este: matematica / sociales / lengua */
+        r('p1_a108','MATEMATICA 4B',1226,20,499,175,'mate'),
+        r('p1_a107','SOCIALES 2C',1226,200,499,180,'soc'),
+        r('p1_a106','LENGUA 4C',1226,385,499,150,'leng'),
+        r('p1_a105','LENGUA 2B',1226,540,499,140,'leng'),
+        r('p1_a104','LENGUA 2A',1226,685,499,175,'leng'),
+        /* sanitarios (sin numeracion) */
+        r('p1_a116','Uso no educativo',758,315,312,48,'noedu'),
+        r('p1_a118','Sanitarios',462,425,608,85,'serv'),
+        r('p1_a119','Sanitarios',462,515,608,70,'serv'),
+        r('p1_a120','ARTE 3B',462,590,608,90,'arte'),
+        /* SOCIALES 4A: nueva sala al oeste (entre Esc. N°1 y Esc. N°2) */
+        r('p1_soc4a','SOCIALES 4A',0,200,155,115,'soc'),
+        /* uso no educativo */
+        r('p1_a100','Uso no educativo',431,745,312,80,'noedu'),
+        r('p1_a101','Uso no educativo',758,745,296,80,'noedu'),
+        /* ala frontal (sobre Av. Nazca) */
+        r('p1_a102','SOCIALES 3A',306,870,452,120,'soc'),
+        r('p1_a103','ARTE 3C',764,870,499,120,'arte'),
+        r('p1_dep','Depósito',1288,885,296,35,'serv')
+    ]
+},
+/* ------------------------- SEGUNDO PISO ------------------------- */
+'2P': {
+    vb: [1475, 1078],
+    pre: b => `<text x="500" y="1058" text-anchor="middle" fill="#64748b" font-size="${b*.6}" font-weight="700" letter-spacing="3">▼ FRENTE AV. NAZCA</text>`,
+    post: b => '',
+    /* DISTRIBUCION ANTES ASIGNADA AL 1ER PISO ("1 ER PISO HECHO.png"),
+       movida al 2do piso: Ed. Fisica, Biologia, Labs. de Comunicacion,
+       Arte, Aula Taller A207, Hall y Sanitarios; resto Uso no educativo. */
+    rooms: [
+        /* uso no educativo */
+        r('p2_noedu_i','Uso no educativo',1310,20,160,780,'noedu'),
+        r('p2_noedu_f','Uso no educativo',1140,810,330,260,'noedu'),
+        r('p2_noedu_t','Uso no educativo',600,215,340,285,'noedu'),
+        r('p2_noedu_c','Uso no educativo',370,365,230,130,'noedu'),
+        r('p2_noedu_l','Uso no educativo',0,510,360,290,'noedu'),
+        r('p2_noedu_m','Uso no educativo',450,515,490,285,'noedu'),
+        /* circulaciones */
+        r('p2_circ_v','Pasillos',950,565,70,440,'circ'),
+        r('p2_circ_v2','Pasillos',1020,215,55,430,'circ'),
+        r('p2_circ_front','Pasillos',70,955,870,65,'circ'),
+        /* escaleras y ascensor */
+        r('p2_asc','Ascensor',885,25,75,75,'stair',{go:['PB','1P'],lift:true}),
+        r('p2_esc1','Esc. N°1',890,105,85,115,'stair',{go:['PB','1P']}),
+        r('p2_esc2','Esc. N°2',835,830,100,100,'stair',{go:['PB','1P']}),
+        /* educacion fisica */
+        r('p2_1bedfis','1B ED FISICA',1020,35,135,180,'edfis'),
+        r('p2_5cedfis','5C ED FISICA',70,805,180,150,'edfis'),
+        /* biologia */
+        r('p2_bio1a','BIOLOGY 1A',1158,35,147,180,'bio'),
+        r('p2_bio1c','BIOLOGY 1C',1075,495,230,145,'bio'),
+        r('p2_biolab','BIOLOGY LABORATORIO',1020,645,285,155,'bio'),
+        /* comunicacion */
+        r('p2_lab2com','LAB 2 COMUNICACIÓN',1075,320,230,165,'comu'),
+        r('p2_videocomu','VIDEO COMU',630,805,200,150,'comu'),
+        /* arte */
+        r('p2_5barte','5B ARTE',255,805,180,150,'arte'),
+        r('p2_5aarte','5A ARTE',440,805,185,150,'arte'),
+        /* taller, admin, hall y sanitarios */
+        r('p2_a207','Aula Taller A207',940,300,75,185,'taller'),
+        r('p2_gab','Gabinete',1075,255,80,60,'admin'),
+        r('p2_prec','Preceptoría',950,515,70,50,'admin'),
+        r('p2_hall','Hall',955,905,65,55,'hall'),
+        r('p2_san209','Sanitarios M.',1020,855,110,70,'serv'),
+        r('p2_san210','Sanitarios V.',1020,935,110,70,'serv')
+    ]
+}
+};
+
+const ROOMS = {};
+FLOORS_INIT();
+function FLOORS_INIT() {
+    FLOOR_ORDER.forEach(f => FLOORS[f].rooms.forEach(rm => { rm.floor = f; ROOMS[rm.id] = rm; }));
+}
+const isInter = rm => !(KIND[rm.k].st);
+
+/* =====================================================================
+   HORARIOS  (datos de ejemplo - reemplazar por los reales)
+===================================================================== */
+const TIME_SLOTS = [
+    { id: 1, label: '08:00 - 08:50' },
+    { id: 2, label: '08:50 - 09:40' },
+    { id: 'recreo1', label: '09:40 - 10:00', isBreak: true, title: 'Recreo en los Patios' },
+    { id: 3, label: '10:00 - 10:50' },
+    { id: 4, label: '10:50 - 11:40' },
+    { id: 'almuerzo', label: '11:40 - 12:30', isBreak: true, title: 'Comedor / Espacio Libre' },
+    { id: 5, label: '12:30 - 13:20' },
+    { id: 6, label: '13:20 - 14:10' }
+];
+const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+
+const TYPE_STYLES = {
+    Patio:  { bg:'bg-emerald-50 hover:bg-emerald-100', border:'border-emerald-200', text:'text-emerald-900', badge:'bg-emerald-200/70 text-emerald-800' },
+    Aula:   { bg:'bg-blue-50 hover:bg-blue-100',       border:'border-blue-200',    text:'text-blue-900',    badge:'bg-blue-200/70 text-blue-800' },
+    Taller: { bg:'bg-indigo-50 hover:bg-indigo-100',   border:'border-indigo-200',  text:'text-indigo-900',  badge:'bg-indigo-200/70 text-indigo-800' }
+};
+
+/* Salones que se listan en la grilla: TODOS los espacios escolares.
+   Quedan fuera pasillos (circ), sanitarios/depositos (serv), escaleras
+   (stair) y zonas no educativas (noedu). */
+const SALON_KINDS = new Set(['aula','soc','mate','leng','comp','lab','taller','esp','edfis','bio','comu','arte','patio','admin','hall']);
+
+const TEACHERS = {
+    'Matemática':['Prof. García','Prof. Ibáñez'], 'Lengua y Literatura':['Prof. Martínez','Prof. Sosa'],
+    'Prácticas del Lenguaje':['Seño Laura','Seño Ana'], 'Ciencias Naturales':['Seño Paula'],
+    'Ciencias Sociales':['Seño Carla'], 'Historia':['Prof. López'], 'Geografía':['Prof. Peralta'],
+    'Biología':['Prof. Rossi'], 'Inglés':['Prof. Smith','Prof. Brown'], 'Física':['Prof. Fernández'],
+    'Química':['Prof. Duarte'], 'Formación Ética':['Prof. Paz'], 'Educación Física':['Prof. Morales','Prof. Ruiz'],
+    'Arte':['Prof. Vega'], 'Plástica':['Seño Lucía'], 'Música':['Prof. Gómez'], 'Informática':['Prof. Torres'],
+    'Tecnología':['Prof. Acosta'], 'Audiovisual':['Prof. Castro'], 'Pastoral':['P. Fernando'],
+    'Juego-trabajo':['Seño Marta'], 'Expresión Corporal':['Prof. Alvarez'], 'Cuentos y Lectura':['Seño Rosa'],
+    'Filosofía':['Prof. Quiroga'], 'Economía':['Prof. Benítez'], 'Taller de Lectura':['Seño Ana']
+};
+/* materias que se dictan en un espacio especial */
+const SPECIAL = {
+    'Educación Física':['pb_patio_desc','p2_1bedfis','p2_5cedfis'],
+    'Informática':['p1_a109'],
+    'Química':['p2_biolab'], 'Física':['p2_biolab'],
+    'Biología':['p2_biolab','p2_bio1a','p2_bio1c'],
+    'Audiovisual':['p2_videocomu'],
+    'Arte':['p2_5barte','p2_5aarte','p1_a120','p1_a103'],
+    'Taller de Lectura':['pb_biblio']
+};
+const SUBJ_JAR = ['Juego-trabajo','Música','Expresión Corporal','Plástica','Cuentos y Lectura'];
+const SUBJ_PRI = ['Matemática','Prácticas del Lenguaje','Ciencias Naturales','Ciencias Sociales','Inglés','Educación Física','Música','Arte','Pastoral','Taller de Lectura'];
+const SUBJ_SEC = ['Matemática','Lengua y Literatura','Historia','Geografía','Biología','Inglés','Física','Química','Formación Ética','Arte','Educación Física','Informática','Tecnología','Audiovisual','Pastoral','Filosofía','Economía'];
+
+const GROUPS = [
+    { g:'1° A', home:'p2_bio1a', s:SUBJ_SEC }, { g:'1° B', home:'p2_bio1c', s:SUBJ_SEC },
+    { g:'2° A', home:'p2_lab2com', s:SUBJ_SEC }, { g:'2° B', home:'p2_a207', s:SUBJ_SEC },
+    { g:'3° A', home:'p2_biolab', s:SUBJ_SEC }, { g:'3° B', home:'p2_1bedfis', s:SUBJ_SEC },
+    { g:'4° A', home:'p2_5cedfis', s:SUBJ_SEC }, { g:'4° B', home:'p2_5barte', s:SUBJ_SEC },
+    { g:'5° A', home:'p2_5aarte', s:SUBJ_SEC }, { g:'5° B', home:'p2_videocomu', s:SUBJ_SEC },
+    { g:'6° A', home:'p1_a108', s:SUBJ_SEC }, { g:'6° B', home:'p1_a107', s:SUBJ_SEC }
+];
+
+function buildClasses() {
+    const out = []; let id = 1;
+    const busyRoom = new Set(), busyTeacher = new Set();
+    const push = (d, s, subject, teacher, roomId, grade) => {
+        const rm = ROOMS[roomId];
+        busyRoom.add(`${d}|${s}|${roomId}`); busyTeacher.add(`${d}|${s}|${teacher}`);
+        out.push({ id: id++, day: DAYS[d], slotId: s, subject, teacher, roomId, roomName: rm.n,
+                   floor: rm.floor, type: SCHED_TYPE[rm.k] || 'Aula', grade });
+    };
+    push(0, 1, 'Acto de Apertura Institucional', 'Equipo Directivo', 'pb_patio_desc', 'Todos');
+    GROUPS.forEach((G, gi) => {
+        for (let d = 0; d < 5; d++) for (let s of [1,2,3,4,5,6]) {
+            if (((gi * 3 + d * 2 + s * 5) % 12) >= 3) continue;
+            const subject = G.s[(gi + d * 2 + s) % G.s.length];
+            const pool = TEACHERS[subject] || ['Docente'];
+            const teacher = pool[gi % pool.length];
+            if (busyTeacher.has(`${d}|${s}|${teacher}`)) continue;
+            let room = G.home;
+            const sp = SPECIAL[subject];
+            if (sp) { const cand = sp[(gi + d + s) % sp.length]; if (!busyRoom.has(`${d}|${s}|${cand}`)) room = cand; }
+            if (busyRoom.has(`${d}|${s}|${room}`)) continue;
+            push(d, s, subject, teacher, room, G.g);
+        }
+    });
+    out.forEach(c => {
+        c.hay = norm(`${c.subject} ${c.teacher} ${c.roomName} ${c.grade} ${c.day} ${FLOOR_NAME[c.floor]} ${c.type}`);
+    });
+    return out;
+}
+const CLASSES = buildClasses();
+
+/* =====================================================================
+   ESTADO
+===================================================================== */
+let currentFloor = 'PB';
+let activeRoom = null;
+let activeSelectedClass = null;
+
+const tokensOf = () => norm($('search-input').value.trim()).split(/\s+/).filter(Boolean);
+
+function getVisible(ignoreFloor) {
+    const tokens = tokensOf();
+    const ff = $('filter-floor').value, tf = $('filter-type').value, df = $('filter-day').value;
+    return CLASSES.filter(c => {
+        if (df !== 'ALL' && c.day !== df) return false;
+        if (!ignoreFloor && ff !== 'ALL' && c.floor !== ff) return false;
+        if (tf !== 'ALL' && c.type !== tf) return false;
+        if (activeRoom && c.roomId !== activeRoom) return false;
+        if (tokens.length && !tokens.every(t => c.hay.includes(t))) return false;
+        return true;
+    });
+}
+const filteringEx = () => !!(tokensOf().length || $('filter-type').value !== 'ALL' || $('filter-day').value !== 'ALL' || activeRoom);
+const isFiltering = () => filteringEx() || $('filter-floor').value !== 'ALL';
+
+function computeState() {
+    const vis = getVisible(false);
+    const visAll = getVisible(true);
+    const countsAll = {};
+    visAll.forEach(c => countsAll[c.roomId] = (countsAll[c.roomId] || 0) + 1);
+    const tokens = tokensOf();
+    const fe = filteringEx();
+    const hl = new Set(); const byFloor = { PB: 0, '1P': 0, '2P': 0 };
+    if (fe) {
+        Object.values(ROOMS).forEach(rm => {
+            if (!isInter(rm) || rm.k === 'stair') return;
+            let hit;
+            if (activeRoom) hit = rm.id === activeRoom;
+            else hit = countsAll[rm.id] > 0 || (tokens.length && tokens.every(t => norm(rm.n).includes(t)));
+            if (hit) { hl.add(rm.id); byFloor[rm.floor]++; }
+        });
+    }
+    return { vis, countsAll, hl, byFloor, fe };
+}
+
+/* =====================================================================
+   MAPA
+===================================================================== */
+function wrapWords(words, mc) {
+    const lines = []; let cur = '';
+    for (const w of words) {
+        if (!cur) cur = w;
+        else if ((cur + ' ' + w).length <= mc) cur += ' ' + w;
+        else { lines.push(cur); cur = w; }
+    }
+    if (cur) lines.push(cur);
+    return lines;
+}
+function fitLabel(name, w, h, base) {
+    const words = name.split(' ');
+    for (let f = base; f >= base * 0.6; f -= base * 0.05) {
+        const mc = Math.floor((w - 8) / (f * 0.56));
+        if (mc < 3) continue;
+        const lines = wrapWords(words, mc);
+        if (lines.some(l => l.length > mc)) continue;
+        if (lines.length * f * 1.2 <= h - 6) return { f, lines };
+    }
+    return null;
+}
+
+function renderMap(state) {
+    const F = FLOORS[currentFloor];
+    /* vb acepta [W,H] o [x0,y0,W,H] (ventana recortada, ej. PB "deja solo eso") */
+    const [vx, vy, W, H] = F.vb.length === 4 ? F.vb : [0, 0, F.vb[0], F.vb[1]];
+    /* F.bs: divisor opcional de escala de etiquetas (default 52); un valor
+       menor agranda textos/bordes relativos a las salas (efecto zoom) */
+    const b = W / (F.bs || 52), sw = b / 10;
+    const svg = $('map-svg');
+    svg.setAttribute('viewBox', `${vx} ${vy} ${W} ${H}`);
+    const { countsAll, hl, fe } = state;
+
+    let h = `<defs>
+        <pattern id="grid" width="${b*1.6}" height="${b*1.6}" patternUnits="userSpaceOnUse"><path d="M ${b*1.6} 0 L 0 0 0 ${b*1.6}" fill="none" stroke="#1e293b" stroke-width="${sw*.5}"/></pattern>
+        <pattern id="hatch" width="${b*.6}" height="${b*.6}" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="${b*.6}" height="${b*.6}" fill="#161f31"/><line x1="0" y1="0" x2="0" y2="${b*.6}" stroke="#41526c" stroke-width="${sw*.7}"/></pattern>
+        ${Object.entries(GRADS).map(([k, g]) => `<linearGradient id="gk_${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${g[0]}"/><stop offset="1" stop-color="${g[1]}"/></linearGradient>`).join('')}
+    </defs>
+    <rect width="${W}" height="${H}" fill="#0f172a"/><rect width="${W}" height="${H}" fill="url(#grid)"/>`;
+    h += F.pre(b);
+
+    F.rooms.forEach(rm => {
+        const k = KIND[rm.k]; const inter = isInter(rm);
+        const n = countsAll[rm.id] || 0;
+        const active = activeRoom === rm.id;
+        const lit = hl.has(rm.id);
+        const dim = fe && inter && rm.k !== 'stair' && !lit;
+        const fill = GRADS[rm.k] ? `url(#gk_${rm.k})` : k.f; /* gradiente sutil si el tipo lo define */
+        let stroke = k.s, strokeW = sw;
+        if (active) { stroke = '#38bdf8'; strokeW = sw * 2.4; }
+        else if (lit) { stroke = '#fbbf24'; strokeW = sw * 2; }
+
+        /* las zonas de "Uso no educativo" se muestran sin texto: solo el rayado gris */
+        const lab = rm.k === 'noedu' ? null : fitLabel(rm.n, rm.w, rm.h, rm.fs || b);
+        let text = '';
+        if (lab) {
+            const lh = lab.f * 1.1;
+            const y0 = rm.tp === 'top' ? rm.y + lab.f * 1.25
+                     : rm.y + rm.h / 2 - ((lab.lines.length - 1) * lh) / 2 + lab.f * 0.35;
+            const cx = rm.x + rm.w / 2;
+            text = `<text x="${cx}" y="${y0}" text-anchor="middle" font-size="${lab.f}" font-weight="600" fill="${k.t}">` +
+                lab.lines.map((l, i) => `<tspan x="${cx}" dy="${i ? lh : 0}">${l}</tspan>`).join('') + `</text>`;
+        }
+        let badge = '';
+        if (fe && n > 0 && inter && rm.w > b * 3 && rm.h > b * 3) {
+            const bx = rm.x + rm.w - b * .75, by = rm.y + b * .75;
+            badge = `<circle cx="${bx}" cy="${by}" r="${b*.6}" fill="#fbbf24"/><text x="${bx}" y="${by + b*.22}" text-anchor="middle" font-size="${b*.55}" font-weight="800" fill="#1e293b">${n}</text>`;
+        }
+        const cls = ['room', inter ? '' : 'static', active ? 'active-room' : ''].join(' ');
+        const title = `${rm.n}${n ? ' · ' + n + ' clases' : ''}`;
+        h += `<g class="${cls}" data-id="${rm.id}" ${dim ? 'opacity=".3"' : ''}>
+            <title>${title}</title>
+            <rect class="shape" x="${rm.x}" y="${rm.y}" width="${rm.w}" height="${rm.h}" rx="${sw*2}" fill="${fill}" fill-opacity="${k.o ?? 1}" stroke="${stroke}" stroke-width="${strokeW}" ${k.d ? `stroke-dasharray="${k.d}"` : ''}/>
+            ${text}${badge}</g>`;
+    });
+    h += F.post(b);
+    svg.innerHTML = h;
+
+    $('svg-floor-title').textContent = FLOOR_NAME[currentFloor].toUpperCase();
+    // info banner
+    const box = $('map-room-info');
+    if (activeRoom) {
+        const rm = ROOMS[activeRoom];
+        const total = CLASSES.filter(c => c.roomId === activeRoom).length;
+        $('info-room-name').textContent = rm.n;
+        $('info-room-desc').textContent = `${FLOOR_NAME[rm.floor]} · ${total ? total + ' clases semanales' : 'sin actividades cargadas'}`;
+        box.classList.remove('hidden');
+    } else box.classList.add('hidden');
+}
+
+function setFloor(f) {
+    currentFloor = f;
+    FLOOR_ORDER.forEach(fl => {
+        $(`floor-${fl}-btn`).className = fl === f
+            ? 'px-2.5 py-1.5 rounded-lg bg-white text-slate-800 shadow-sm font-semibold transition-all'
+            : 'px-2.5 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 transition-all';
+    });
+    $('active-floor-text').textContent = 'Ubicación actual: ' + FLOOR_NAME[f];
+    renderAll();
+}
+
+function selectRoom(id, force) {
+    const rm = ROOMS[id]; if (!rm) return;
+    activeRoom = (!force && activeRoom === id) ? null : id;
+    if (rm.floor !== currentFloor) { currentFloor = rm.floor; setFloor(rm.floor); return; }
+    renderAll();
+}
+
+/* ---- escaleras / ascensor ---- */
+function openStairModal(rm) {
+    $('stair-modal-title').textContent = rm.n;
+    $('stair-modal-icon').className = 'fa-solid text-lg ' + (rm.lift ? 'fa-elevator' : 'fa-stairs');
+    const box = $('stair-modal-buttons'); box.innerHTML = '';
+    rm.go.forEach(f => {
+        const up = FLOOR_ORDER.indexOf(f) > FLOOR_ORDER.indexOf(currentFloor);
+        const btn = document.createElement('button');
+        btn.className = 'w-full py-2.5 px-4 bg-slate-100 hover:bg-brand-500 hover:text-white rounded-xl text-xs font-semibold text-slate-700 transition-colors flex items-center justify-between';
+        btn.innerHTML = `<span>${up ? 'Subir a' : 'Bajar a'} ${FLOOR_NAME[f]}</span><i class="fa-solid ${up ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>`;
+        btn.onclick = () => { closeStairModal(); setFloor(f); };
+        box.appendChild(btn);
+    });
+    const m = $('stair-modal'); m.classList.remove('hidden'); setTimeout(() => m.classList.remove('opacity-0'), 10);
+}
+function closeStairModal() { const m = $('stair-modal'); m.classList.add('opacity-0'); setTimeout(() => m.classList.add('hidden'), 200); }
+
+/* =====================================================================
+   GRILLA
+===================================================================== */
+function nowSlotId() {
+    const n = new Date(), dow = n.getDay();
+    if (dow < 1 || dow > 5) return null;
+    const m = n.getHours() * 60 + n.getMinutes();
+    for (const s of TIME_SLOTS) {
+        const [a, b] = s.label.split(' - ').map(t => { const [hh, mm] = t.split(':'); return +hh * 60 + +mm; });
+        if (m >= a && m < b) return s.id;
+    }
+    return null;
+}
+
+function renderGrid(state) {
+    const vis = state.vis;
+    const nowId = nowSlotId();
+    const filtering = isFiltering();
+    const slotIdx = s => TIME_SLOTS.findIndex(t => t.id === s);
+    const slotLabel = s => (TIME_SLOTS.find(t => t.id === s) || {}).label || '';
+
+    /* GRILLA POR SALONES: en vez de la matriz Módulo x Días, una fila por cada
+       salón que hay, agrupada por piso y ordenada como en el plano (arriba-abajo,
+       izquierda-derecha). El día y el módulo de cada clase van como dato en la
+       tarjeta, no como eje de la tabla. */
+    const salas = [];
+    FLOOR_ORDER.forEach(f => FLOORS[f].rooms.forEach(rm => { if (SALON_KINDS.has(rm.k)) salas.push(rm); }));
+    salas.sort((a, b) => FLOOR_ORDER.indexOf(a.floor) - FLOOR_ORDER.indexOf(b.floor) || a.y - b.y || a.x - b.x);
+
+    $('schedule-table').style.minWidth = '720px';
+    $('schedule-thead').innerHTML = `<tr class="bg-slate-100 border-b border-slate-200 text-xs font-semibold text-slate-700">
+        <th class="p-3 w-48 text-left border-r border-slate-200 bg-slate-100"><i class="fa-solid fa-door-open text-slate-400 mr-1"></i> Salón</th>
+        <th class="p-3 text-left bg-slate-100"><i class="fa-solid fa-calendar-week text-slate-400 mr-1"></i> Actividades <span class="font-normal text-slate-400">· clic en una clase para ubicarla en el plano</span></th></tr>`;
+
+    let html = '';
+    FLOOR_ORDER.forEach(f => {
+        const rows = [];
+        salas.filter(rm => rm.floor === f).forEach(rm => {
+            const items = vis.filter(c => c.roomId === rm.id)
+                .sort((a, b) => DAYS.indexOf(a.day) - DAYS.indexOf(b.day) || slotIdx(a.slotId) - slotIdx(b.slotId) || a.grade.localeCompare(b.grade));
+            if (filtering && !items.length) return;
+            const st = TYPE_STYLES[SCHED_TYPE[rm.k]] || TYPE_STYLES.Aula;
+            const body = items.length
+                ? `<div class="flex flex-wrap gap-1.5">` + items.map(c => {
+                    const cs = TYPE_STYLES[c.type] || TYPE_STYLES.Aula;
+                    const ahora = c.slotId === nowId;
+                    return `<div data-class-id="${c.id}" class="class-card p-1.5 rounded-lg border ${cs.bg} ${cs.border} cursor-pointer transition-all hover:shadow-md ${activeRoom === c.roomId ? 'ring-2 ring-brand-500' : ''} ${ahora ? 'ring-2 ring-amber-400' : ''}">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-[9px] font-bold px-1 rounded ${cs.badge} shrink-0">${c.grade}</span>
+                            <span class="text-[9px] font-mono text-slate-500 truncate">${ahora ? '<b class=\"text-amber-600\">● AHORA</b> · ' : ''}${c.day} · ${slotLabel(c.slotId)}</span>
+                        </div>
+                        <h4 class="font-bold ${cs.text} text-[11px] leading-snug truncate">${c.subject}</h4>
+                        <p class="text-[10px] text-slate-600 truncate"><i class="fa-solid fa-user-tie text-slate-400"></i> ${c.teacher} · ${c.type} • ${c.floor}</p>
+                    </div>`;
+                }).join('') + `</div>`
+                : `<span class="text-[10px] text-slate-400 italic">Sin actividades cargadas en esta sala</span>`;
+            rows.push(`<tr class="${activeRoom === rm.id ? 'bg-brand-50/60' : ''}">
+                <td class="p-2.5 align-top border-r border-slate-200 bg-slate-50/80">
+                    <div class="font-bold text-slate-800 text-[11px] leading-snug">${rm.n}</div>
+                    <div class="mt-1 flex flex-wrap gap-1">
+                        <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-md bg-slate-200 text-slate-600">${FLOOR_NAME[rm.floor]}</span>
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-md border ${st.border} ${st.badge}">${SCHED_TYPE[rm.k] || 'Espacio'}</span>
+                    </div>
+                    ${items.length ? `<div class="text-[9px] text-slate-400 mt-1 font-medium">${items.length} ${items.length === 1 ? 'actividad semanal' : 'actividades semanales'}</div>` : ''}
+                </td>
+                <td class="p-2 align-top">${body}</td></tr>`);
+        });
+        if (!rows.length) return;
+        html += `<tr class="bg-slate-800 text-white"><td colspan="2" class="px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase">${FLOOR_NAME[f]} · ${rows.length} ${rows.length === 1 ? 'salón' : 'salones'}</td></tr>` + rows.join('');
+    });
+    $('schedule-tbody').innerHTML = html;
+}
+
+function updateResultsBar(state) {
+    const bar = $('results-bar'), none = $('no-results-state');
+    const term = $('search-input').value.trim();
+    const ff = $('filter-floor').value, tf = $('filter-type').value, df = $('filter-day').value;
+    const count = state.vis.length;
+    const roomHits = state.hl.size;
+    $('clear-search-btn').classList.toggle('hidden', !term);
+
+    if (!isFiltering()) { bar.classList.add('hidden'); none.classList.add('hidden'); return; }
+    bar.classList.remove('hidden');
+    $('results-count').textContent = `${count} ${count === 1 ? 'actividad' : 'actividades'}`;
+    $('results-rooms').textContent = state.fe ? `${roomHits} ${roomHits === 1 ? 'espacio' : 'espacios'} en el plano` : '';
+    $('results-rooms').classList.toggle('hidden', !state.fe);
+
+    const tags = [];
+    if (term) tags.push(['bg-slate-200 text-slate-700', `"${term}"`]);
+    if (ff !== 'ALL') tags.push(['bg-amber-100 text-amber-800', FLOOR_NAME[ff]]);
+    if (tf !== 'ALL') tags.push(['bg-indigo-100 text-indigo-800', tf]);
+    if (df !== 'ALL') tags.push(['bg-emerald-100 text-emerald-800', df]);
+    if (activeRoom) tags.push(['bg-blue-100 text-blue-800', ROOMS[activeRoom].n]);
+    $('active-tag-container').innerHTML = tags.map(([c, t]) => `<span class="${c} px-2 py-0.5 rounded-full">${t}</span>`).join('');
+
+    if (count === 0) {
+        none.classList.remove('hidden');
+        $('no-results-hint').textContent = roomHits
+            ? 'No hay clases cargadas, pero el espacio buscado está resaltado en el plano.'
+            : 'No existen materias que coincidan con la búsqueda o el filtro seleccionado.';
+    } else none.classList.add('hidden');
+}
+
+function updateBadges(state) {
+    FLOOR_ORDER.forEach(f => {
+        const el = $('badge-' + f);
+        const n = state.byFloor[f];
+        el.textContent = n; el.classList.toggle('hidden', !(state.fe && n > 0));
+    });
+}
+
+function renderAll() {
+    const state = computeState();
+    renderMap(state);
+    renderGrid(state);
+    updateResultsBar(state);
+    updateBadges(state);
+}
+
+/* =====================================================================
+   MODAL DE CLASE
+===================================================================== */
+function openClassModal(id) {
+    const c = CLASSES.find(x => x.id === Number(id)); if (!c) return;
+    activeSelectedClass = c;
+    const slot = TIME_SLOTS.find(s => s.id === c.slotId);
+    $('modal-course-badge').textContent = `${c.grade} • ${c.floor}`;
+    $('modal-subject-title').textContent = c.subject;
+    $('modal-teacher').textContent = c.teacher;
+    $('modal-room').textContent = `${c.roomName} (${FLOOR_NAME[c.floor]})`;
+    $('modal-schedule').textContent = `${c.day} de ${slot ? slot.label : ''} hs`;
+    const m = $('class-modal'); m.classList.remove('hidden'); setTimeout(() => m.classList.remove('opacity-0'), 10);
+}
+function closeModal() { const m = $('class-modal'); m.classList.add('opacity-0'); setTimeout(() => m.classList.add('hidden'), 200); }
+
+/* =====================================================================
+   INICIO
+===================================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+    $('search-input').addEventListener('input', renderAll);
+    $('filter-floor').addEventListener('change', e => { if (e.target.value !== 'ALL') setFloor(e.target.value); else renderAll(); });
+    $('filter-type').addEventListener('change', renderAll);
+    $('filter-day').addEventListener('change', renderAll);
+    $('clear-search-btn').addEventListener('click', () => { $('search-input').value = ''; renderAll(); });
+
+    const resetAll = () => {
+        $('search-input').value = ''; $('filter-floor').value = 'ALL'; $('filter-type').value = 'ALL'; $('filter-day').value = 'ALL';
+        activeRoom = null; setFloor('PB');
+    };
+    $('reset-filters-btn').addEventListener('click', resetAll);
+    $('clear-search-fallback-btn').addEventListener('click', resetAll);
+    $('clear-room-filter-btn').addEventListener('click', () => { activeRoom = null; renderAll(); });
+
+    FLOOR_ORDER.forEach(f => $(`floor-${f}-btn`).addEventListener('click', () => setFloor(f)));
+
+    $('map-svg').addEventListener('click', e => {
+        const g = e.target.closest('[data-id]'); if (!g) return;
+        const rm = ROOMS[g.dataset.id]; if (!rm || !isInter(rm)) return;
+        if (rm.k === 'stair') openStairModal(rm); else selectRoom(rm.id);
+    });
+
+    $('schedule-tbody').addEventListener('click', e => {
+        const card = e.target.closest('.class-card'); if (card) openClassModal(card.dataset.classId);
+    });
+
+    $('close-modal-btn').addEventListener('click', closeModal);
+    $('close-stair-modal-btn').addEventListener('click', closeStairModal);
+    $('class-modal').addEventListener('click', e => { if (e.target.id === 'class-modal') closeModal(); });
+    $('stair-modal').addEventListener('click', e => { if (e.target.id === 'stair-modal') closeStairModal(); });
+
+    $('locate-on-map-btn').addEventListener('click', () => {
+        if (!activeSelectedClass) return;
+        selectRoom(activeSelectedClass.roomId, true);
+        closeModal();
+        if (window.innerWidth < 1024) $('map-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    let expanded = false;
+    $('expand-map-btn').addEventListener('click', () => {
+        expanded = !expanded;
+        $('map-section').classList.toggle('lg:col-span-6', !expanded);
+        $('map-section').classList.toggle('lg:col-span-12', expanded);
+        $('grid-section').classList.toggle('lg:col-span-6', !expanded);
+        $('grid-section').classList.toggle('lg:col-span-12', expanded);
+    });
+
+    const updateClock = () => { $('live-time-display').textContent = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); };
+    setInterval(updateClock, 1000); updateClock();
+
+    setFloor('PB');
+});
+</script>
+</body>
+</html>
