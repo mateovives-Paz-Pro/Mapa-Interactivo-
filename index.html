@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Colegio Schönthal - Plano Interactivo y Horarios</title>
+    <title>Colegio Schönthal · Plano Interactivo de Actividades</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -70,7 +70,7 @@
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </div>
                     <input type="text" id="search-input" autocomplete="off"
-                        placeholder="Buscar por materia, profesor, curso, día o espacio (ej: Patio de las Palmeras, BIOLOGY LABORATORIO, Lab. Química, Prof. García)..."
+                        placeholder="Buscar por muestra, curso, salón o espacio (ej: Malvinas, Egipto, Soberanía, Patio de las Palmeras)..."
                         class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all">
                     <button id="clear-search-btn" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
                         <i class="fa-solid fa-circle-xmark text-sm"></i>
@@ -89,14 +89,10 @@
                         <option value="Aula">Aulas de Clase</option>
                         <option value="Taller">Talleres, Labs y Especiales</option>
                     </select>
-                    <select id="filter-day" class="w-full sm:w-auto px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-700 font-medium">
-                        <option value="ALL">Todos los días</option>
-                        <option value="Lunes">Lunes</option>
-                        <option value="Martes">Martes</option>
-                        <option value="Miércoles">Miércoles</option>
-                        <option value="Jueves">Jueves</option>
-                        <option value="Viernes">Viernes</option>
-                    </select>
+                    <div class="w-full sm:w-auto px-3 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-600 font-semibold flex items-center justify-center gap-2" title="Jornada única de actividades">
+                        <i class="fa-regular fa-calendar-check text-brand-500"></i>
+                        <span>6 de noviembre</span>
+                    </div>
                     <button id="reset-filters-btn" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-1.5" title="Restablecer Filtros">
                         <i class="fa-solid fa-rotate-left text-xs"></i>
                         <span class="hidden sm:inline">Limpiar</span>
@@ -120,9 +116,9 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h2 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                            <i class="fa-solid fa-map-location-dot text-brand-500"></i> Plano Arquitectónico Real
+                            <i class="fa-solid fa-map-location-dot text-brand-500"></i> DÍA DE LA MUESTRA ANUAL
                         </h2>
-                        <p class="text-xs text-slate-500">Clic en un espacio para filtrar sus clases · clic en <strong class="text-amber-600">Escaleras / Ascensor</strong> para cambiar de piso</p>
+                        <p class="text-xs text-slate-500">Clic en un espacio para filtrar sus actividades · los espacios con <i class="fa-solid fa-star text-amber-500"></i> tienen actividades de la jornada dentro · clic en <strong class="text-amber-600">Escaleras / Ascensor</strong> para cambiar de piso</p>
                     </div>
                     <div class="flex items-center gap-2 self-start sm:self-auto">
                         <div class="inline-flex p-1 bg-slate-100 rounded-xl text-xs font-semibold">
@@ -140,10 +136,6 @@
                     <div class="absolute top-3 left-3 bg-slate-900/85 backdrop-blur-md px-3 py-1 rounded-lg border border-slate-700 text-[11px] font-bold text-amber-400 z-10 flex items-center gap-2">
                         <i class="fa-solid fa-stairs"></i> <span id="svg-floor-title">PLANTA BAJA</span>
                     </div>
-                    <div class="absolute top-3 right-3 bg-slate-900/85 backdrop-blur-md px-2.5 py-1 rounded-lg border border-brand-500/40 text-[10px] font-bold text-brand-300 z-10 flex items-center gap-1.5">
-                        <i class="fa-solid fa-road text-brand-400"></i> <span>▼ Frente Av. Nazca</span>
-                    </div>
-
                     <svg id="map-svg" class="w-full h-auto" style="max-height: 78vh" viewBox="0 0 1185 1065" xmlns="http://www.w3.org/2000/svg"></svg>
 
                     <div id="map-room-info" class="hidden absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur-md border border-slate-700 text-white p-3 rounded-xl shadow-lg flex items-center justify-between z-20">
@@ -169,6 +161,14 @@
                     <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-amber-500/30 border border-amber-500"></span> Oficinas / Adm.</span>
                     <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-orange-500/30 border border-orange-500"></span> Escaleras / Ascensor</span>
                     <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-slate-500/30 border border-slate-500"></span> Pasillos / Servicios</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-purple-400/30 border border-purple-400"></span> Matemática</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-yellow-400/30 border border-yellow-400"></span> Sociales</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-sky-400/30 border border-sky-400"></span> Lengua</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-green-400/30 border border-green-400"></span> Biología</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-red-400/30 border border-red-400"></span> Comunicación</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-pink-400/30 border border-pink-400"></span> Arte</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-orange-400/30 border border-orange-400"></span> Ed. Física</span>
+                    <span class="flex items-center gap-1.5 font-semibold text-amber-700"><i class="fa-solid fa-star text-amber-500"></i> Espacio con actividades</span>
                 </div>
             </section>
 
@@ -177,9 +177,9 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h2 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                            <i class="fa-solid fa-calendar-week text-brand-500"></i> Horarios y Distribución
+                            <i class="fa-solid fa-calendar-day text-brand-500"></i> Actividades de la Jornada
                         </h2>
-                        <p class="text-xs text-slate-500">Clic en una clase para ubicarla en el plano</p>
+                        <p class="text-xs text-slate-500">Jornada del <strong class="text-brand-600">6 de noviembre</strong> · actividades simultáneas, salvo las que tienen horario especificado · clic en una actividad para ubicarla en el plano</p>
                     </div>
                     <div class="flex items-center gap-1.5 text-[10px] font-semibold">
                         <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">Patio</span>
@@ -206,7 +206,7 @@
 
                 <p class="text-[11px] text-slate-400 flex items-start gap-1.5">
                     <i class="fa-solid fa-circle-info mt-0.5"></i>
-                    Los horarios son datos de ejemplo generados por <code class="bg-slate-100 px-1 rounded">buildClasses()</code>. Reemplazalos por los reales editando el arreglo <code class="bg-slate-100 px-1 rounded">CLASSES</code> en el código.
+                    Las actividades de la jornada están cargadas en el arreglo <code class="bg-slate-100 px-1 rounded">REAL_ACTIVITIES</code> del código: cada espacio <i class="fa-solid fa-star text-amber-500"></i> reúne dentro sus muestras. Todo es simultáneo y sin docentes; los horarios se indican por actividad solo cuando la escuela los define (ej.: funciones de la Biblioteca, Escape Room de 4° B). Editá ese arreglo para ajustar el programa.
                 </p>
             </section>
         </div>
@@ -242,16 +242,16 @@
             </div>
             <div class="space-y-3.5 text-sm">
                 <div class="flex items-center gap-3 text-slate-700">
-                    <div class="w-8 text-center text-slate-400"><i class="fa-solid fa-user-tie"></i></div>
-                    <div><p class="text-xs text-slate-400 font-medium">Profesor / Docente</p><p id="modal-teacher" class="font-semibold text-slate-800"></p></div>
-                </div>
-                <div class="flex items-center gap-3 text-slate-700">
                     <div class="w-8 text-center text-slate-400"><i class="fa-solid fa-location-dot"></i></div>
                     <div><p class="text-xs text-slate-400 font-medium">Ubicación en Plano</p><p id="modal-room" class="font-semibold text-brand-600"></p></div>
                 </div>
                 <div class="flex items-center gap-3 text-slate-700">
                     <div class="w-8 text-center text-slate-400"><i class="fa-regular fa-clock"></i></div>
-                    <div><p class="text-xs text-slate-400 font-medium">Día y Horario</p><p id="modal-schedule" class="font-semibold text-slate-800"></p></div>
+                    <div><p class="text-xs text-slate-400 font-medium">Jornada</p><p id="modal-schedule" class="font-semibold text-slate-800"></p></div>
+                </div>
+                <div class="flex items-center gap-3 text-slate-700 hidden" id="modal-desc-row">
+                    <div class="w-8 text-center text-slate-400"><i class="fa-solid fa-circle-info"></i></div>
+                    <div><p class="text-xs text-slate-400 font-medium">Detalle</p><p id="modal-desc" class="font-medium text-slate-700"></p></div>
                 </div>
             </div>
             <div class="pt-2 flex gap-3">
@@ -273,13 +273,14 @@ const r = (id, n, x, y, w, h, k, o = {}) => ({ id, n, x, y, w, h, k, ...o });
 const FLOOR_ORDER = ['PB', '1P', '2P'];
 const FLOOR_NAME = { PB: 'Planta Baja', '1P': 'Primer Piso', '2P': 'Segundo Piso' };
 
-/* Colores por tipo de espacio (f = relleno plano, s = borde, t = texto,
-   o = opacidad SOLO del relleno — los bordes quedan con su color pleno,
-   d = línea punteada). Los tipos con gradiente definido en
-   GRADS se pintan con url(#gk_<tipo>) en renderMap(): misma familia de
-   color original, con profundidad sutil. */
+/* Colores por tipo de espacio — ESTILO NEÓN (referencia: Lab 1 Lucas / comp):
+   interior profundo del propio color de cada aula (f, con gradiente GRADS)
+   + borde neón brillante (s) + texto pastel claro (t), respetando el color
+   de cada sala. o = opacidad SOLO del relleno — los bordes quedan con su
+   color pleno, d = línea punteada. Los tipos con gradiente definido en
+   GRADS se pintan con url(#gk_<tipo>) en renderMap(). */
 const KIND = {
-    aula:   { f:'#1c3050', s:'#5d8cc0', t:'#dbeafe', o:.8 },
+    aula:   { f:'#1c3050', s:'#60a5fa', t:'#dbeafe', o:.8 },
     comp:   { f:'#083344', s:'#22d3ee', t:'#a5f3fc', o:.8 },
     lab:    { f:'#054430', s:'#34d399', t:'#d1fae5', o:.8 },
     taller: { f:'#312e81', s:'#9ba3f5', t:'#e0e7ff', o:.8 },
@@ -292,17 +293,18 @@ const KIND = {
     void:   { f:'#0284c7', s:'#0284c7', t:'#38bdf8', o:.07, d:'8 6', st:true },
     noedu:  { f:'url(#hatch)', s:'#4b5c76', t:'#94a3b8', d:'8 6', st:true },
     stair:  { f:'#b23a08', s:'#ffab6b', t:'#fff7ed' },
-    /* tipos del 2º piso ("1 ER PISO HECHO.png") */
-    edfis:  { f:'#f6740a', s:'#ffcf9e', t:'#4a1d03', o:.8 },
-    bio:    { f:'#1ca344', s:'#a4eebb', t:'#0b3d1c', o:.8 },
-    comu:   { f:'#d5141d', s:'#ffb9bd', t:'#ffffff', o:.8 },
-    arte:   { f:'#ffa5c2', s:'#ef6f9d', t:'#701a3c', o:.8 },
-    /* tipos nuevos del 1er piso ("piso 1 de verdad no mames.png") */
-    soc:    { f:'#f7ce00', s:'#d9b400', t:'#3d3200', o:.8 },
-    mate:   { f:'#97409f', s:'#d9a8e2', t:'#2a0a2e', o:.8 },
-    leng:   { f:'#0090d4', s:'#8ad7f8', t:'#04263a', o:.8 }
+    /* tipos del 2º piso ("1 ER PISO HECHO.png") — versión neón del mismo color */
+    edfis:  { f:'#431407', s:'#fb923c', t:'#fed7aa', o:.8 },
+    bio:    { f:'#052e16', s:'#4ade80', t:'#bbf7d0', o:.8 },
+    comu:   { f:'#450a0a', s:'#f87171', t:'#fecaca', o:.8 },
+    arte:   { f:'#500724', s:'#f472b6', t:'#fbcfe8', o:.8 },
+    /* tipos nuevos del 1er piso ("piso 1 de verdad no mames.png") — neón */
+    soc:    { f:'#451a03', s:'#facc15', t:'#fef08a', o:.8 },
+    mate:   { f:'#3b0764', s:'#c084fc', t:'#e9d5ff', o:.8 },
+    leng:   { f:'#082f49', s:'#38bdf8', t:'#bae6fd', o:.8 }
 };
-/* Gradientes verticales [claro -> oscuro] por tipo: embellece conservando el color original */
+/* Gradientes verticales [claro -> oscuro] por tipo: profundidad neón,
+   conservando la familia de color original de cada aula */
 const GRADS = {
     aula:   ['#2b4a6f', '#1c3050'],
     comp:   ['#0d5a7a', '#083344'],
@@ -315,13 +317,13 @@ const GRADS = {
     hall:   ['#2c4260', '#1e293b'],
     circ:   ['#1d2a42', '#16202f'],
     stair:  ['#e2600e', '#b23a08'],
-    edfis:  ['#ffa04a', '#f6740a'],
-    bio:    ['#3ecf68', '#1ca344'],
-    comu:   ['#f65a62', '#d5141d'],
-    arte:   ['#ffc9da', '#ffa5c2'],
-    soc:    ['#ffe95e', '#f7ce00'],
-    mate:   ['#b663c9', '#97409f'],
-    leng:   ['#2cb4f2', '#0090d4']
+    edfis:  ['#9a3412', '#431407'],
+    bio:    ['#166534', '#052e16'],
+    comu:   ['#b91c1c', '#450a0a'],
+    arte:   ['#9d174d', '#500724'],
+    soc:    ['#854d0e', '#451a03'],
+    mate:   ['#7e22ce', '#3b0764'],
+    leng:   ['#0369a1', '#082f49']
 };
 const SCHED_TYPE = { aula:'Aula', soc:'Aula', mate:'Aula', leng:'Aula', comp:'Taller', lab:'Taller', taller:'Taller', esp:'Taller', patio:'Patio', edfis:'Taller', bio:'Taller', comu:'Taller', arte:'Taller' };
 
@@ -334,7 +336,7 @@ const FLOORS = {
 PB: {
     /* "EN PLANTA BAJA PONE ESO": vista del ala este completo (badges inferiores
        visibles, como en la maqueta) con etiquetas grandes (bs 30).
-       Comedor renombrado Cocodrilo segun la maqueta. */
+       Capilla (antes "Cocodrilo") reubicada junto a Esc. N°2. */
     vb: [509, 23, 747, 1000],
     bs: 30,
     pre: b => '',
@@ -361,7 +363,7 @@ PB: {
         r('pb_dep_r','Depósito',905,385,65,25,'serv'),
         r('pb_circ_r','Pasillos',850,465,50,365,'circ'),
         r('pb_esc_hall','Esc. Hall',575,480,65,75,'stair',{go:['1P']}),
-        r('pb_comedor','Cocodrilo',905,505,70,60,'esp',{fs:12}),
+        r('pb_capilla_esc2','Capilla',902,752,80,62,'esp',{fs:12,dyB:.55}),  /* dyB: baja la etiqueta para no pisar la estrella */
         r('pb_circ_mid','Uso no educativo',520,585,45,245,'noedu'),
         r('pb_patio','Uso no educativo',490,585,30,160,'noedu'),
         r('pb_noedu_pc','Uso no educativo',570,585,280,160,'noedu'),
@@ -386,7 +388,7 @@ PB: {
 /* ------------------------- PRIMER PISO ------------------------- */
 '1P': {
     vb: [1747, 1048],
-    pre: b => `<text x="873" y="1032" text-anchor="middle" fill="#64748b" font-size="${b*.6}" font-weight="700" letter-spacing="3">▼ FRENTE AV. NAZCA</text>`,
+    pre: b => '',
     post: b => '',
     /* SECCION UNICA DEL 1ER PISO ("piso 1 de verdad no mames.png"): sector
        Esc. N°1 / Aulas / Sanitarios con la asignacion por materia del usuario
@@ -407,7 +409,7 @@ PB: {
         r('p1_esc1','Esc. N°1',150,100,296,100,'stair',{go:['PB','2P']}),
         r('p1_esc2','Esc. N°2',0,690,234,100,'stair',{go:['PB','2P']}),
         /* informatica y gabinete */
-        r('p1_a109','COMPUTACION LUCAS',477,20,468,160,'comp'),
+        r('p1_a109','Lab. Lucas (INF)',477,20,468,160,'comp'),
         r('p1_gab','Gabinete',961,125,119,50,'admin'),
         /* columna este: matematica / sociales / lengua */
         r('p1_a108','MATEMATICA 4B',1226,20,499,175,'mate'),
@@ -425,7 +427,7 @@ PB: {
         /* uso no educativo */
         r('p1_a100','Uso no educativo',431,745,312,80,'noedu'),
         r('p1_a101','Uso no educativo',758,745,296,80,'noedu'),
-        /* ala frontal (sobre Av. Nazca) */
+        /* ala frontal */
         r('p1_a102','SOCIALES 3A',306,870,452,120,'soc'),
         r('p1_a103','ARTE 3C',764,870,499,120,'arte'),
         r('p1_dep','Depósito',1288,885,296,35,'serv')
@@ -434,7 +436,7 @@ PB: {
 /* ------------------------- SEGUNDO PISO ------------------------- */
 '2P': {
     vb: [1475, 1078],
-    pre: b => `<text x="500" y="1058" text-anchor="middle" fill="#64748b" font-size="${b*.6}" font-weight="700" letter-spacing="3">▼ FRENTE AV. NAZCA</text>`,
+    pre: b => '',
     post: b => '',
     /* DISTRIBUCION ANTES ASIGNADA AL 1ER PISO ("1 ER PISO HECHO.png"),
        movida al 2do piso: Ed. Fisica, Biologia, Labs. de Comunicacion,
@@ -455,16 +457,16 @@ PB: {
         r('p2_asc','Ascensor',885,25,75,75,'stair',{go:['PB','1P'],lift:true}),
         r('p2_esc1','Esc. N°1',890,105,85,115,'stair',{go:['PB','1P']}),
         r('p2_esc2','Esc. N°2',835,830,100,100,'stair',{go:['PB','1P']}),
-        /* educacion fisica */
-        r('p2_1bedfis','1B ED FISICA',1020,35,135,180,'edfis'),
+        /* sociales (ex 1B ED FISICA, recolor a soc amarillo) */
+        r('p2_1bedfis','SOCIALES 1B',1020,35,135,180,'soc'),
         r('p2_5cedfis','5C ED FISICA',70,805,180,150,'edfis'),
         /* biologia */
         r('p2_bio1a','BIOLOGY 1A',1158,35,147,180,'bio'),
         r('p2_bio1c','BIOLOGY 1C',1075,495,230,145,'bio'),
         r('p2_biolab','BIOLOGY LABORATORIO',1020,645,285,155,'bio'),
         /* comunicacion */
-        r('p2_lab2com','LAB 2 COMUNICACIÓN',1075,320,230,165,'comu'),
-        r('p2_videocomu','VIDEO COMU',630,805,200,150,'comu'),
+        r('p2_lab2com','Lab 2 Ariel (INF)',1075,320,230,165,'comu'),
+        r('p2_videocomu','Taller de Video',630,805,200,150,'comu'),
         /* arte */
         r('p2_5barte','5B ARTE',255,805,180,150,'arte'),
         r('p2_5aarte','5A ARTE',440,805,185,150,'arte'),
@@ -487,19 +489,20 @@ function FLOORS_INIT() {
 const isInter = rm => !(KIND[rm.k].st);
 
 /* =====================================================================
-   HORARIOS  (datos de ejemplo - reemplazar por los reales)
+   JORNADA 6 DE NOVIEMBRE — ACTIVIDADES SIMULTÁNEAS
+   Sin eje de módulos horarios y sin docentes: todo sucede a la vez.
+   Cuando la escuela defina horarios, se especificarán por actividad.
 ===================================================================== */
-const TIME_SLOTS = [
-    { id: 1, label: '08:00 - 08:50' },
-    { id: 2, label: '08:50 - 09:40' },
-    { id: 'recreo1', label: '09:40 - 10:00', isBreak: true, title: 'Recreo en los Patios' },
-    { id: 3, label: '10:00 - 10:50' },
-    { id: 4, label: '10:50 - 11:40' },
-    { id: 'almuerzo', label: '11:40 - 12:30', isBreak: true, title: 'Comedor / Espacio Libre' },
-    { id: 5, label: '12:30 - 13:20' },
-    { id: 6, label: '13:20 - 14:10' }
-];
-const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+const DAYS = ['6 de noviembre'];
+
+/* Aulas anfitrionas de la jornada: cada puntito del plano es un aula que
+   reúne dentro las muestras de varios cursos (id de sala -> eje temático). */
+const AULAS_ANFITRIONAS = {
+    p1_soc4a:   'Proyecto Soberanía - Banco Central',   /* AULA de 4° A */
+    p1_a107:    'Proyecto Soberanía',                   /* AULA 2° C   */
+    p1_a102:    'Proyectos Varios',                     /* AULA de 3° A */
+    p2_1bedfis: 'Historia Antigua'                       /* AULA de 1° B */
+};
 
 const TYPE_STYLES = {
     Patio:  { bg:'bg-emerald-50 hover:bg-emerald-100', border:'border-emerald-200', text:'text-emerald-900', badge:'bg-emerald-200/70 text-emerald-800' },
@@ -512,66 +515,99 @@ const TYPE_STYLES = {
    (stair) y zonas no educativas (noedu). */
 const SALON_KINDS = new Set(['aula','soc','mate','leng','comp','lab','taller','esp','edfis','bio','comu','arte','patio','admin','hall']);
 
-const TEACHERS = {
-    'Matemática':['Prof. García','Prof. Ibáñez'], 'Lengua y Literatura':['Prof. Martínez','Prof. Sosa'],
-    'Prácticas del Lenguaje':['Seño Laura','Seño Ana'], 'Ciencias Naturales':['Seño Paula'],
-    'Ciencias Sociales':['Seño Carla'], 'Historia':['Prof. López'], 'Geografía':['Prof. Peralta'],
-    'Biología':['Prof. Rossi'], 'Inglés':['Prof. Smith','Prof. Brown'], 'Física':['Prof. Fernández'],
-    'Química':['Prof. Duarte'], 'Formación Ética':['Prof. Paz'], 'Educación Física':['Prof. Morales','Prof. Ruiz'],
-    'Arte':['Prof. Vega'], 'Plástica':['Seño Lucía'], 'Música':['Prof. Gómez'], 'Informática':['Prof. Torres'],
-    'Tecnología':['Prof. Acosta'], 'Audiovisual':['Prof. Castro'], 'Pastoral':['P. Fernando'],
-    'Juego-trabajo':['Seño Marta'], 'Expresión Corporal':['Prof. Alvarez'], 'Cuentos y Lectura':['Seño Rosa'],
-    'Filosofía':['Prof. Quiroga'], 'Economía':['Prof. Benítez'], 'Taller de Lectura':['Seño Ana']
-};
-/* materias que se dictan en un espacio especial */
-const SPECIAL = {
-    'Educación Física':['pb_patio_desc','p2_1bedfis','p2_5cedfis'],
-    'Informática':['p1_a109'],
-    'Química':['p2_biolab'], 'Física':['p2_biolab'],
-    'Biología':['p2_biolab','p2_bio1a','p2_bio1c'],
-    'Audiovisual':['p2_videocomu'],
-    'Arte':['p2_5barte','p2_5aarte','p1_a120','p1_a103'],
-    'Taller de Lectura':['pb_biblio']
-};
-const SUBJ_JAR = ['Juego-trabajo','Música','Expresión Corporal','Plástica','Cuentos y Lectura'];
-const SUBJ_PRI = ['Matemática','Prácticas del Lenguaje','Ciencias Naturales','Ciencias Sociales','Inglés','Educación Física','Música','Arte','Pastoral','Taller de Lectura'];
-const SUBJ_SEC = ['Matemática','Lengua y Literatura','Historia','Geografía','Biología','Inglés','Física','Química','Formación Ética','Arte','Educación Física','Informática','Tecnología','Audiovisual','Pastoral','Filosofía','Economía'];
+/* =====================================================================
+   ACTIVIDADES REALES DE LA JORNADA (cargadas por la escuela - editar)
+   Todo sucede el 6 de noviembre y es SIMULTÁNEO, sin docentes. Solo se
+   muestra horario donde la escuela lo especifica (campo `hora`), ej.:
+   funciones de la Biblioteca y Escape Room de 4° B.
+   subject: muestra/actividad | room: id de la sala del plano | grade:
+   curso(s) que exponen, separados con " / " | hora: opcional ("9:30",
+   "9 a 12") | desc: detalle opcional.
+   Las aulas anfitrionas (AULAS_ANFITRIONAS) ordenan el programa: dentro
+   de cada una conviven las muestras de los cursos que indica la escuela.
+===================================================================== */
+const REAL_ACTIVITIES = [
+    /* --- AULA de 4° A · eje: Proyecto Soberanía - Banco Central --- */
+    { subject:'Proyecto Soberanía - Banco Central', room:'p1_soc4a', grade:'4° A' },
+    { subject:'Muestra de producción de Billetes (colgados sobre las paredes)', room:'p1_soc4a', grade:'4° B' },
+    { subject:'Trabajos y fotos impresas de la salida: fragmentos de T.P. escritos y T.P. producciones audiovisuales', room:'p1_soc4a', grade:'4° A / 4° B / 4° C' },
 
-const GROUPS = [
-    { g:'1° A', home:'p2_bio1a', s:SUBJ_SEC }, { g:'1° B', home:'p2_bio1c', s:SUBJ_SEC },
-    { g:'2° A', home:'p2_lab2com', s:SUBJ_SEC }, { g:'2° B', home:'p2_a207', s:SUBJ_SEC },
-    { g:'3° A', home:'p2_biolab', s:SUBJ_SEC }, { g:'3° B', home:'p2_1bedfis', s:SUBJ_SEC },
-    { g:'4° A', home:'p2_5cedfis', s:SUBJ_SEC }, { g:'4° B', home:'p2_5barte', s:SUBJ_SEC },
-    { g:'5° A', home:'p2_5aarte', s:SUBJ_SEC }, { g:'5° B', home:'p2_videocomu', s:SUBJ_SEC },
-    { g:'6° A', home:'p1_a108', s:SUBJ_SEC }, { g:'6° B', home:'p1_a107', s:SUBJ_SEC }
+    /* --- AULA 2° C · eje: Proyecto Soberanía --- */
+    { subject:'Muestra con stands interactivos sobre Identidad Nacional', room:'p1_a107', grade:'2° B' },
+    { subject:'Muestra sobre visita al Museo Malvinas: producciones audiovisuales y fotos del Prof. Cetrángolo', room:'p1_a107', grade:'4° A / 4° B / 4° C' },
+    { subject:'Afiche de Malvinas con cartas de los estudiantes y foto grupal impresa', room:'p1_a107', grade:'3° C' },
+    { subject:'Mapa antiguo de Malvinas y cartelería sobre la ocupación de Malvinas y Vuelta de Obligado', room:'p1_a107', grade:'3° A / 3° C' },
+
+    /* --- AULA de 3° A · eje: Proyectos Varios --- */
+    { subject:'Muestra sobre el Mundial y la diversidad cultural: afiches y stands interactivos', room:'p1_a102', grade:'1° A / 1° B / 1° C' },
+    { subject:'Muestra sobre visita al Cementerio de Recoleta: cartelería y fotos grupales', room:'p1_a102', grade:'1° A / 1° C' },
+    { subject:'Muestra sobre visita a la Reserva Ecológica: fotos, maquetas y audiovisuales', room:'p1_a102', grade:'4° A / 4° B / 4° C' },
+
+    /* --- AULA de 1° B · eje: Historia Antigua --- */
+    { subject:'Los secretos del Antiguo Egipto y Grecia: maquetas, afiches y alumnos personificando', room:'p2_1bedfis', grade:'1° B' },
+
+    /* --- BIOLOGY LABORATORIO · trabajos que se ven adentro (simultáneos,
+           una actividad por ítem, con el curso que la presenta) --- */
+    { subject:'Deporte y Alimentación', room:'p2_biolab', grade:'2° A / 2° B' },
+    { subject:'Ensayo sobre alcoholismo', room:'p2_biolab', grade:'2° A / 2° B' },
+    { subject:'Ensayo de lluvia ácida', room:'p2_biolab', grade:'2° A / 2° B' },
+    { subject:'Dinosaurios y juego sobre ellos', room:'p2_biolab', grade:'1° A' },
+    { subject:'Presentación del Ecosistema Dual', room:'p2_biolab', grade:'1° A' },
+    { subject:'Ensayo sobre larvas: ¿consumen telgopor o no?', room:'p2_biolab', grade:'1° A' },
+    { subject:'Presentación mediante un planisferio: 25 publicaciones internacionales del año sobre 5 trabajos realizados', room:'p2_biolab', grade:'1° A' },
+
+    /* --- 5C ED FISICA --- */
+    { subject:'Video y fotos de los Interbandos', room:'p2_5cedfis', grade:'5° C' },
+
+    /* --- Capilla · proyecto de 5° (simultáneo) --- */
+    { subject:'Proyecto "Mapa de la esperanza"', room:'pb_capilla_esc2', grade:'5° A / 5° B / 5° C' },
+
+    /* --- Lab 2 Ariel (Informática) --- */
+    { subject:'Exposición de Proyectos', room:'p2_lab2com', grade:'5° A / 2° A / 2° B / 2° C / 1° B' },
+
+    /* --- Aulas de Lengua · Departamento de Lengua y Literatura --- */
+    { subject:'Departamento de Lengua y Literatura', room:'p1_a104' },
+    { subject:'Departamento de Lengua y Literatura', room:'p1_a105' },
+    { subject:'Departamento de Lengua y Literatura', room:'p1_a106' },
+
+    /* --- Taller de Video · comunicación (simultáneas) --- */
+    { subject:'Muestra de comunicación', room:'p2_videocomu' },
+    { subject:'Demostración de Radio y Streaming', room:'p2_videocomu', grade:'5° C' },
+    { subject:'Cobertura del Mundial "Fulbito"', room:'p2_videocomu' },
+    { subject:'Proyecto de comunicación', room:'p2_videocomu' },
+    { subject:'Campaña gráfica y tipografía', room:'p2_videocomu' },
+
+    /* --- Lab. Lucas (Informática) --- */
+    { subject:'Presentación', room:'p1_a109', grade:'5° A / 4° C' },
+
+    /* --- Biblioteca · cine, videos y teatro (con horarios especificados) --- */
+    { subject:'Primer estreno: cortometraje "Hacelo corto 2026"', room:'pb_biblio', hora:'9:30' },
+    { subject:'Función 2: cortometraje "Hacelo corto 2026"', room:'pb_biblio', hora:'11:00' },
+    { subject:'Videos de Artes Visuales', room:'pb_biblio', grade:'2° año / 5° año', hora:'9 a 12' },
+    { subject:'Obra de Teatro "Reflejos"', room:'pb_biblio', hora:'10:00' },
+    { subject:'2da función: Obra de Teatro "Reflejos"', room:'pb_biblio', hora:'11:30' },
+
+    /* --- Aula 4° B · Escape Room de ciencias (con horario especificado) --- */
+    { subject:'Escape Room: Matemática, Física y Biología', room:'p1_a108', grade:'Desde 3° año', hora:'9 a 12', desc:'2 grupos de 4 alumnos cada uno · destinado a alumnos de 3° año en adelante' }
 ];
 
 function buildClasses() {
+    /* Jornada del 6 de noviembre: SOLO actividades reales, todas simultáneas,
+       sin docentes. Cada aula anfitriona muestra lo cargado en
+       REAL_ACTIVITIES; el resto queda "sin actividades" hasta que la escuela
+       complete el programa. */
     const out = []; let id = 1;
-    const busyRoom = new Set(), busyTeacher = new Set();
-    const push = (d, s, subject, teacher, roomId, grade) => {
-        const rm = ROOMS[roomId];
-        busyRoom.add(`${d}|${s}|${roomId}`); busyTeacher.add(`${d}|${s}|${teacher}`);
-        out.push({ id: id++, day: DAYS[d], slotId: s, subject, teacher, roomId, roomName: rm.n,
-                   floor: rm.floor, type: SCHED_TYPE[rm.k] || 'Aula', grade });
-    };
-    push(0, 1, 'Acto de Apertura Institucional', 'Equipo Directivo', 'pb_patio_desc', 'Todos');
-    GROUPS.forEach((G, gi) => {
-        for (let d = 0; d < 5; d++) for (let s of [1,2,3,4,5,6]) {
-            if (((gi * 3 + d * 2 + s * 5) % 12) >= 3) continue;
-            const subject = G.s[(gi + d * 2 + s) % G.s.length];
-            const pool = TEACHERS[subject] || ['Docente'];
-            const teacher = pool[gi % pool.length];
-            if (busyTeacher.has(`${d}|${s}|${teacher}`)) continue;
-            let room = G.home;
-            const sp = SPECIAL[subject];
-            if (sp) { const cand = sp[(gi + d + s) % sp.length]; if (!busyRoom.has(`${d}|${s}|${cand}`)) room = cand; }
-            if (busyRoom.has(`${d}|${s}|${room}`)) continue;
-            push(d, s, subject, teacher, room, G.g);
-        }
+    /* orden auxiliar: minutos de inicio del horario (9999 = sin horario -> simultánea) */
+    const horaOrd = h => { const m = /(\d{1,2})(?::(\d{2}))?/.exec(h || ''); return m ? (+m[1]) * 60 + (+m[2] || 0) : 9999; };
+    REAL_ACTIVITIES.forEach(a => {
+        const rm = ROOMS[a.room]; if (!rm) return;
+        out.push({ id: id++, day: a.day || DAYS[0], subject: a.subject,
+                   roomId: a.room, roomName: rm.n, floor: rm.floor, type: SCHED_TYPE[rm.k] || 'Aula',
+                   grade: a.grade || 'Todos', hora: a.hora || '', desc: a.desc || '',
+                   horaOrd: horaOrd(a.hora), eje: AULAS_ANFITRIONAS[a.room] || '', real: true });
     });
     out.forEach(c => {
-        c.hay = norm(`${c.subject} ${c.teacher} ${c.roomName} ${c.grade} ${c.day} ${FLOOR_NAME[c.floor]} ${c.type}`);
+        c.hay = norm(`${c.subject} ${c.roomName} ${c.grade} ${c.hora} ${c.desc} ${c.day} ${c.eje} ${FLOOR_NAME[c.floor]} ${c.type}`);
     });
     return out;
 }
@@ -588,9 +624,8 @@ const tokensOf = () => norm($('search-input').value.trim()).split(/\s+/).filter(
 
 function getVisible(ignoreFloor) {
     const tokens = tokensOf();
-    const ff = $('filter-floor').value, tf = $('filter-type').value, df = $('filter-day').value;
+    const ff = $('filter-floor').value, tf = $('filter-type').value;
     return CLASSES.filter(c => {
-        if (df !== 'ALL' && c.day !== df) return false;
         if (!ignoreFloor && ff !== 'ALL' && c.floor !== ff) return false;
         if (tf !== 'ALL' && c.type !== tf) return false;
         if (activeRoom && c.roomId !== activeRoom) return false;
@@ -598,7 +633,7 @@ function getVisible(ignoreFloor) {
         return true;
     });
 }
-const filteringEx = () => !!(tokensOf().length || $('filter-type').value !== 'ALL' || $('filter-day').value !== 'ALL' || activeRoom);
+const filteringEx = () => !!(tokensOf().length || $('filter-type').value !== 'ALL' || activeRoom);
 const isFiltering = () => filteringEx() || $('filter-floor').value !== 'ALL';
 
 function computeState() {
@@ -682,7 +717,7 @@ function renderMap(state) {
         if (lab) {
             const lh = lab.f * 1.1;
             const y0 = rm.tp === 'top' ? rm.y + lab.f * 1.25
-                     : rm.y + rm.h / 2 - ((lab.lines.length - 1) * lh) / 2 + lab.f * 0.35;
+                     : rm.y + rm.h / 2 - ((lab.lines.length - 1) * lh) / 2 + lab.f * 0.35 + (rm.dyB ? b * rm.dyB : 0);
             const cx = rm.x + rm.w / 2;
             text = `<text x="${cx}" y="${y0}" text-anchor="middle" font-size="${lab.f}" font-weight="600" fill="${k.t}">` +
                 lab.lines.map((l, i) => `<tspan x="${cx}" dy="${i ? lh : 0}">${l}</tspan>`).join('') + `</text>`;
@@ -692,12 +727,19 @@ function renderMap(state) {
             const bx = rm.x + rm.w - b * .75, by = rm.y + b * .75;
             badge = `<circle cx="${bx}" cy="${by}" r="${b*.6}" fill="#fbbf24"/><text x="${bx}" y="${by + b*.22}" text-anchor="middle" font-size="${b*.55}" font-weight="800" fill="#1e293b">${n}</text>`;
         }
+        /* espacios con actividades: cada puntito es un aula con sus cosas dentro */
+        const eje = AULAS_ANFITRIONAS[rm.id];
+        let star = '';
+        if ((eje || n > 0) && inter && rm.w > b * 2.4 && rm.h > b * 2.4) {
+            const sx = rm.x + b * .8, sy = rm.y + b * .8;
+            star = `<circle cx="${sx}" cy="${sy}" r="${b*.55}" fill="#fbbf24" stroke="#92400e" stroke-width="${sw*.7}"/><text x="${sx}" y="${sy + b*.21}" text-anchor="middle" font-size="${b*.58}" fill="#78350f">★</text>`;
+        }
         const cls = ['room', inter ? '' : 'static', active ? 'active-room' : ''].join(' ');
-        const title = `${rm.n}${n ? ' · ' + n + ' clases' : ''}`;
+        const title = `${rm.n}${eje ? ' · ' + eje : ''}${n ? ' · ' + n + ' actividades' : ''}`;
         h += `<g class="${cls}" data-id="${rm.id}" ${dim ? 'opacity=".3"' : ''}>
             <title>${title}</title>
             <rect class="shape" x="${rm.x}" y="${rm.y}" width="${rm.w}" height="${rm.h}" rx="${sw*2}" fill="${fill}" fill-opacity="${k.o ?? 1}" stroke="${stroke}" stroke-width="${strokeW}" ${k.d ? `stroke-dasharray="${k.d}"` : ''}/>
-            ${text}${badge}</g>`;
+            ${text}${badge}${star}</g>`;
     });
     h += F.post(b);
     svg.innerHTML = h;
@@ -708,8 +750,9 @@ function renderMap(state) {
     if (activeRoom) {
         const rm = ROOMS[activeRoom];
         const total = CLASSES.filter(c => c.roomId === activeRoom).length;
+        const eje = AULAS_ANFITRIONAS[activeRoom];
         $('info-room-name').textContent = rm.n;
-        $('info-room-desc').textContent = `${FLOOR_NAME[rm.floor]} · ${total ? total + ' clases semanales' : 'sin actividades cargadas'}`;
+        $('info-room-desc').textContent = `${FLOOR_NAME[rm.floor]}${eje ? ' · Eje: ' + eje : ''} · ${total ? total + (total === 1 ? ' actividad en la jornada' : ' actividades en la jornada') : 'sin actividades en la jornada'}`;
         box.classList.remove('hidden');
     } else box.classList.add('hidden');
 }
@@ -752,23 +795,14 @@ function closeStairModal() { const m = $('stair-modal'); m.classList.add('opacit
 /* =====================================================================
    GRILLA
 ===================================================================== */
-function nowSlotId() {
-    const n = new Date(), dow = n.getDay();
-    if (dow < 1 || dow > 5) return null;
-    const m = n.getHours() * 60 + n.getMinutes();
-    for (const s of TIME_SLOTS) {
-        const [a, b] = s.label.split(' - ').map(t => { const [hh, mm] = t.split(':'); return +hh * 60 + +mm; });
-        if (m >= a && m < b) return s.id;
-    }
-    return null;
-}
-
 function renderGrid(state) {
     const vis = state.vis;
-    const nowId = nowSlotId();
     const filtering = isFiltering();
-    const slotIdx = s => TIME_SLOTS.findIndex(t => t.id === s);
-    const slotLabel = s => (TIME_SLOTS.find(t => t.id === s) || {}).label || '';
+    /* la búsqueda por nombre mantiene visible la fila del salón aunque no
+       tenga actividades (es un directorio): mismo criterio que el resaltado
+       amarillo del plano */
+    const tokens = tokensOf();
+    const nameHit = rm => tokens.length && tokens.every(t => norm(rm.n).includes(t));
 
     /* GRILLA POR SALONES: en vez de la matriz Módulo x Días, una fila por cada
        salón que hay, agrupada por piso y ordenada como en el plano (arriba-abajo,
@@ -781,38 +815,42 @@ function renderGrid(state) {
     $('schedule-table').style.minWidth = '720px';
     $('schedule-thead').innerHTML = `<tr class="bg-slate-100 border-b border-slate-200 text-xs font-semibold text-slate-700">
         <th class="p-3 w-48 text-left border-r border-slate-200 bg-slate-100"><i class="fa-solid fa-door-open text-slate-400 mr-1"></i> Salón</th>
-        <th class="p-3 text-left bg-slate-100"><i class="fa-solid fa-calendar-week text-slate-400 mr-1"></i> Actividades <span class="font-normal text-slate-400">· clic en una clase para ubicarla en el plano</span></th></tr>`;
+        <th class="p-3 text-left bg-slate-100"><i class="fa-solid fa-calendar-week text-slate-400 mr-1"></i> Actividades <span class="font-normal text-slate-400">· clic en una actividad para ubicarla en el plano</span></th></tr>`;
 
     let html = '';
     FLOOR_ORDER.forEach(f => {
         const rows = [];
         salas.filter(rm => rm.floor === f).forEach(rm => {
             const items = vis.filter(c => c.roomId === rm.id)
-                .sort((a, b) => DAYS.indexOf(a.day) - DAYS.indexOf(b.day) || slotIdx(a.slotId) - slotIdx(b.slotId) || a.grade.localeCompare(b.grade));
-            if (filtering && !items.length) return;
+                .sort((a, b) => (a.horaOrd - b.horaOrd) || a.grade.localeCompare(b.grade) || a.subject.localeCompare(b.subject));
+            if (filtering && !items.length && !nameHit(rm)) return;
             const st = TYPE_STYLES[SCHED_TYPE[rm.k]] || TYPE_STYLES.Aula;
             const body = items.length
                 ? `<div class="flex flex-wrap gap-1.5">` + items.map(c => {
                     const cs = TYPE_STYLES[c.type] || TYPE_STYLES.Aula;
-                    const ahora = c.slotId === nowId;
-                    return `<div data-class-id="${c.id}" class="class-card p-1.5 rounded-lg border ${cs.bg} ${cs.border} cursor-pointer transition-all hover:shadow-md ${activeRoom === c.roomId ? 'ring-2 ring-brand-500' : ''} ${ahora ? 'ring-2 ring-amber-400' : ''}">
+                    const chip = c.hora
+                        ? `<span class="text-[9px] font-semibold text-brand-700 bg-white/70 border border-brand-200 px-1 rounded shrink-0" title="Horario especificado por la escuela"><i class="fa-regular fa-clock mr-0.5"></i>${c.hora} hs</span>`
+                        : `<span class="text-[9px] font-semibold text-amber-600 shrink-0" title="Jornada simultánea: sin horario">Simultánea</span>`;
+                    return `<div data-class-id="${c.id}" class="class-card p-1.5 rounded-lg border ${cs.bg} ${cs.border} cursor-pointer transition-all hover:shadow-md ${activeRoom === c.roomId ? 'ring-2 ring-brand-500' : ''}">
                         <div class="flex items-center justify-between gap-1">
                             <span class="text-[9px] font-bold px-1 rounded ${cs.badge} shrink-0">${c.grade}</span>
-                            <span class="text-[9px] font-mono text-slate-500 truncate">${ahora ? '<b class=\"text-amber-600\">● AHORA</b> · ' : ''}${c.day} · ${slotLabel(c.slotId)}</span>
+                            ${chip}
                         </div>
-                        <h4 class="font-bold ${cs.text} text-[11px] leading-snug truncate">${c.subject}</h4>
-                        <p class="text-[10px] text-slate-600 truncate"><i class="fa-solid fa-user-tie text-slate-400"></i> ${c.teacher} · ${c.type} • ${c.floor}</p>
+                        <h4 class="font-bold ${cs.text} text-[11px] leading-snug" title="${c.subject}">${c.subject}</h4>
+                        ${c.desc ? `<p class="text-[10px] text-slate-600 leading-snug">${c.desc}</p>` : ''}
+                        <p class="text-[10px] text-slate-600 truncate">${c.type} • ${c.floor}</p>
                     </div>`;
                 }).join('') + `</div>`
                 : `<span class="text-[10px] text-slate-400 italic">Sin actividades cargadas en esta sala</span>`;
             rows.push(`<tr class="${activeRoom === rm.id ? 'bg-brand-50/60' : ''}">
                 <td class="p-2.5 align-top border-r border-slate-200 bg-slate-50/80">
                     <div class="font-bold text-slate-800 text-[11px] leading-snug">${rm.n}</div>
+                    ${AULAS_ANFITRIONAS[rm.id] ? `<div class="text-[9px] text-amber-700 font-semibold mt-0.5 flex items-center gap-1"><i class="fa-solid fa-star text-[8px] text-amber-500"></i>${AULAS_ANFITRIONAS[rm.id]}</div>` : ''}
                     <div class="mt-1 flex flex-wrap gap-1">
                         <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-md bg-slate-200 text-slate-600">${FLOOR_NAME[rm.floor]}</span>
                         <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-md border ${st.border} ${st.badge}">${SCHED_TYPE[rm.k] || 'Espacio'}</span>
                     </div>
-                    ${items.length ? `<div class="text-[9px] text-slate-400 mt-1 font-medium">${items.length} ${items.length === 1 ? 'actividad semanal' : 'actividades semanales'}</div>` : ''}
+                    ${items.length ? `<div class="text-[9px] text-slate-400 mt-1 font-medium">${items.length} ${items.length === 1 ? 'actividad en la jornada' : 'actividades en la jornada'}</div>` : ''}
                 </td>
                 <td class="p-2 align-top">${body}</td></tr>`);
         });
@@ -825,7 +863,7 @@ function renderGrid(state) {
 function updateResultsBar(state) {
     const bar = $('results-bar'), none = $('no-results-state');
     const term = $('search-input').value.trim();
-    const ff = $('filter-floor').value, tf = $('filter-type').value, df = $('filter-day').value;
+    const ff = $('filter-floor').value, tf = $('filter-type').value;
     const count = state.vis.length;
     const roomHits = state.hl.size;
     $('clear-search-btn').classList.toggle('hidden', !term);
@@ -840,7 +878,6 @@ function updateResultsBar(state) {
     if (term) tags.push(['bg-slate-200 text-slate-700', `"${term}"`]);
     if (ff !== 'ALL') tags.push(['bg-amber-100 text-amber-800', FLOOR_NAME[ff]]);
     if (tf !== 'ALL') tags.push(['bg-indigo-100 text-indigo-800', tf]);
-    if (df !== 'ALL') tags.push(['bg-emerald-100 text-emerald-800', df]);
     if (activeRoom) tags.push(['bg-blue-100 text-blue-800', ROOMS[activeRoom].n]);
     $('active-tag-container').innerHTML = tags.map(([c, t]) => `<span class="${c} px-2 py-0.5 rounded-full">${t}</span>`).join('');
 
@@ -874,12 +911,12 @@ function renderAll() {
 function openClassModal(id) {
     const c = CLASSES.find(x => x.id === Number(id)); if (!c) return;
     activeSelectedClass = c;
-    const slot = TIME_SLOTS.find(s => s.id === c.slotId);
     $('modal-course-badge').textContent = `${c.grade} • ${c.floor}`;
     $('modal-subject-title').textContent = c.subject;
-    $('modal-teacher').textContent = c.teacher;
     $('modal-room').textContent = `${c.roomName} (${FLOOR_NAME[c.floor]})`;
-    $('modal-schedule').textContent = `${c.day} de ${slot ? slot.label : ''} hs`;
+    $('modal-schedule').textContent = c.hora ? `${c.day} · ${c.hora} hs (horario especificado)` : `${c.day} · actividad simultánea (sin horario)`;
+    $('modal-desc-row').classList.toggle('hidden', !c.desc);
+    $('modal-desc').textContent = c.desc || '';
     const m = $('class-modal'); m.classList.remove('hidden'); setTimeout(() => m.classList.remove('opacity-0'), 10);
 }
 function closeModal() { const m = $('class-modal'); m.classList.add('opacity-0'); setTimeout(() => m.classList.add('hidden'), 200); }
@@ -891,11 +928,10 @@ document.addEventListener('DOMContentLoaded', () => {
     $('search-input').addEventListener('input', renderAll);
     $('filter-floor').addEventListener('change', e => { if (e.target.value !== 'ALL') setFloor(e.target.value); else renderAll(); });
     $('filter-type').addEventListener('change', renderAll);
-    $('filter-day').addEventListener('change', renderAll);
     $('clear-search-btn').addEventListener('click', () => { $('search-input').value = ''; renderAll(); });
 
     const resetAll = () => {
-        $('search-input').value = ''; $('filter-floor').value = 'ALL'; $('filter-type').value = 'ALL'; $('filter-day').value = 'ALL';
+        $('search-input').value = ''; $('filter-floor').value = 'ALL'; $('filter-type').value = 'ALL';
         activeRoom = null; setFloor('PB');
     };
     $('reset-filters-btn').addEventListener('click', resetAll);
