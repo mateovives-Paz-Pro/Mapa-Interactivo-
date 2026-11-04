@@ -85,9 +85,21 @@
                     </select>
                     <select id="filter-type" class="w-full sm:w-auto px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-700 font-medium">
                         <option value="ALL">Todos los Espacios</option>
-                        <option value="Patio">Patios y Libres</option>
-                        <option value="Aula">Aulas de Clase</option>
-                        <option value="Taller">Talleres, Labs y Especiales</option>
+                        <option value="soc">Sociales</option>
+                        <option value="leng">Lengua</option>
+                        <option value="arte">Arte</option>
+                        <option value="mate">Matemática</option>
+                        <option value="bio">Biology</option>
+                        <option value="edfis">Ed. Física</option>
+                        <option value="inf">Informática</option>
+                    </select>
+                    <select id="filter-grade" class="w-full sm:w-auto px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-700 font-medium" title="Filtrar por curso">
+                        <option value="ALL">Cursos</option>
+                        <option value="1">1° año</option>
+                        <option value="2">2° año</option>
+                        <option value="3">3° año</option>
+                        <option value="4">4° año</option>
+                        <option value="5">5° año</option>
                     </select>
                     <div class="w-full sm:w-auto px-3 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-600 font-semibold flex items-center justify-center gap-2" title="Jornada única de actividades">
                         <i class="fa-regular fa-calendar-check text-brand-500"></i>
@@ -179,7 +191,7 @@
                         <h2 class="font-bold text-slate-900 text-base flex items-center gap-2">
                             <i class="fa-solid fa-calendar-day text-brand-500"></i> Actividades de la Jornada
                         </h2>
-                        <p class="text-xs text-slate-500">Jornada del <strong class="text-brand-600">6 de noviembre</strong> · actividades simultáneas, salvo las que tienen horario especificado · clic en una actividad para ubicarla en el plano</p>
+                        <p class="text-xs text-slate-500">Jornada del <strong class="text-brand-600">6 de noviembre</strong> · actividades de todo el día, salvo las que tienen horario especificado · clic en una actividad para ubicarla en el plano</p>
                     </div>
                     <div class="flex items-center gap-1.5 text-[10px] font-semibold">
                         <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">Patio</span>
@@ -206,7 +218,7 @@
 
                 <p class="text-[11px] text-slate-400 flex items-start gap-1.5">
                     <i class="fa-solid fa-circle-info mt-0.5"></i>
-                    Las actividades de la jornada están cargadas en el arreglo <code class="bg-slate-100 px-1 rounded">REAL_ACTIVITIES</code> del código: cada espacio <i class="fa-solid fa-star text-amber-500"></i> reúne dentro sus muestras. Todo es simultáneo y sin docentes; los horarios se indican por actividad solo cuando la escuela los define (ej.: funciones de la Biblioteca, Escape Room de 4° B). Editá ese arreglo para ajustar el programa.
+                    Las actividades de la jornada están cargadas en el arreglo <code class="bg-slate-100 px-1 rounded">REAL_ACTIVITIES</code> del código: cada espacio <i class="fa-solid fa-star text-amber-500"></i> reúne dentro sus muestras. Todo ocurre durante toda la jornada y sin docentes; los horarios se indican por actividad solo cuando la escuela los define (ej.: funciones de la Biblioteca, Escape Room de 4° B). Editá ese arreglo para ajustar el programa.
                 </p>
             </section>
         </div>
@@ -354,13 +366,11 @@ PB: {
         r('pb_biblio','Biblioteca',855,150,110,95,'esp'),
         r('pb_galeria_n','Galería',770,262,75,75,'circ'),
         r('pb_asc','Ascensor',828,312,45,32,'stair',{go:['1P','2P'],lift:true}),
-        r('pb_archivo','Archivo',900,310,75,40,'serv'),
         r('pb_galeria','Uso no educativo',490,410,360,55,'noedu'),
         r('pb_dep2','Uso no educativo',495,480,22,85,'noedu'),
         r('pb_hall_sj','Uso no educativo',522,475,50,95,'noedu'),
         r('pb_sj5','Uso no educativo',650,475,75,95,'noedu'),
         r('pb_sj_2a','Uso no educativo',735,475,90,95,'noedu'),
-        r('pb_dep_r','Depósito',905,385,65,25,'serv'),
         r('pb_circ_r','Pasillos',850,465,50,365,'circ'),
         r('pb_esc_hall','Esc. Hall',575,480,65,75,'stair',{go:['1P']}),
         r('pb_capilla_esc2','Capilla',902,752,80,62,'esp',{fs:12,dyB:.55}),  /* dyB: baja la etiqueta para no pisar la estrella */
@@ -408,9 +418,8 @@ PB: {
         r('p1_asc','Ascensor',181,20,265,70,'stair',{go:['PB','2P'],lift:true}),
         r('p1_esc1','Esc. N°1',150,100,296,100,'stair',{go:['PB','2P']}),
         r('p1_esc2','Esc. N°2',0,690,234,100,'stair',{go:['PB','2P']}),
-        /* informatica y gabinete */
-        r('p1_a109','Lab. Lucas (INF)',477,20,468,160,'comp'),
-        r('p1_gab','Gabinete',961,125,119,50,'admin'),
+        /* informatica */
+        r('p1_a109','Lab 1 Lucas (INF)',477,20,468,160,'comu'),
         /* columna este: matematica / sociales / lengua */
         r('p1_a108','MATEMATICA 4B',1226,20,499,175,'mate'),
         r('p1_a107','SOCIALES 2C',1226,200,499,180,'soc'),
@@ -429,8 +438,7 @@ PB: {
         r('p1_a101','Uso no educativo',758,745,296,80,'noedu'),
         /* ala frontal */
         r('p1_a102','SOCIALES 3A',306,870,452,120,'soc'),
-        r('p1_a103','ARTE 3C',764,870,499,120,'arte'),
-        r('p1_dep','Depósito',1288,885,296,35,'serv')
+        r('p1_a103','ARTE 3C',764,870,499,120,'arte')
     ]
 },
 /* ------------------------- SEGUNDO PISO ------------------------- */
@@ -440,7 +448,7 @@ PB: {
     post: b => '',
     /* DISTRIBUCION ANTES ASIGNADA AL 1ER PISO ("1 ER PISO HECHO.png"),
        movida al 2do piso: Ed. Fisica, Biologia, Labs. de Comunicacion,
-       Arte, Aula Taller A207, Hall y Sanitarios; resto Uso no educativo. */
+       Arte, Hall y Sanitarios; resto Uso no educativo. */
     rooms: [
         /* uso no educativo */
         r('p2_noedu_i','Uso no educativo',1310,20,160,780,'noedu'),
@@ -471,7 +479,6 @@ PB: {
         r('p2_5barte','5B ARTE',255,805,180,150,'arte'),
         r('p2_5aarte','5A ARTE',440,805,185,150,'arte'),
         /* taller, admin, hall y sanitarios */
-        r('p2_a207','Aula Taller A207',940,300,75,185,'taller'),
         r('p2_gab','Gabinete',1075,255,80,60,'admin'),
         r('p2_prec','Preceptoría',950,515,70,50,'admin'),
         r('p2_hall','Hall',955,905,65,55,'hall'),
@@ -565,10 +572,28 @@ const REAL_ACTIVITIES = [
     /* --- Lab 2 Ariel (Informática) --- */
     { subject:'Exposición de Proyectos', room:'p2_lab2com', grade:'5° A / 2° A / 2° B / 2° C / 1° B' },
 
-    /* --- Aulas de Lengua · Departamento de Lengua y Literatura --- */
-    { subject:'Departamento de Lengua y Literatura', room:'p1_a104' },
-    { subject:'Departamento de Lengua y Literatura', room:'p1_a105' },
-    { subject:'Departamento de Lengua y Literatura', room:'p1_a106' },
+    /* --- Aulas de Lengua --- */
+    { subject:'Alfabetización Cultural', room:'p1_a104', grade:'3° año / 1° año' },
+    { subject:'Microrrelatos', room:'p1_a105' },
+    { subject:'Informe Audiovisual', room:'p1_a106', grade:'4° año' },
+
+    /* --- Inglés · BIOLOGY 1C (contenido del aula de 1° C) --- */
+    { subject:'INGLÉS Intensificación Avanzado · BREAKFAST AROUND THE WORLD', room:'p2_bio1c', grade:'2° año' },
+    { subject:'INGLÉS Intensificación Intermedio · BLOGS AND VLOGS', room:'p2_bio1c', grade:'2° año' },
+    { subject:'INGLÉS Intensificación Avanzado · SPORTS AND INJURIES', room:'p2_bio1c', grade:'1° año' },
+    { subject:'INGLÉS Intensificación · NEW ENTREPRENEURS', room:'p2_bio1c', grade:'4° año' },
+
+    /* --- Inglés · Aula 1° B (etiqueta INGLÉS + nivel para no mezclar con Sociales) --- */
+    { subject:'INGLÉS Intensificación Avanzado · MOVIE TRAILERS', room:'p2_1bedfis', grade:'2° año' },
+    { subject:'INGLÉS Intensificación Avanzado · PUNS', room:'p2_1bedfis', grade:'1° año' },
+    { subject:'INGLÉS Intensificación Avanzado · MEMES', room:'p2_1bedfis', grade:'2° año' },
+    { subject:'INGLÉS Intermedio · DIORAMAS LITERARIOS', room:'p2_1bedfis', grade:'2° año' },
+    { subject:'INGLÉS Avanzado · DIARIO DE UN GENOCIDIO', room:'p2_1bedfis', grade:'5° año' },
+    { subject:'INGLÉS Intensificación de 5° año · CICLO DE ENTREVISTAS', room:'p2_1bedfis', grade:'4° año / 5° año' },
+    { subject:'INGLÉS · POESÍA', room:'p2_1bedfis', grade:'1° a 5° año' },
+
+    /* --- Inglés · Patio de las Palmeras --- */
+    { subject:'ENGLISH THROUGH SONGS', room:'pb_patio_desc', grade:'1° / 2° / 3° año', desc:'Avanzado (1° y 2°) · Intermedio (3°)' },
 
     /* --- Taller de Video · comunicación (simultáneas) --- */
     { subject:'Muestra de comunicación', room:'p2_videocomu' },
@@ -576,8 +601,9 @@ const REAL_ACTIVITIES = [
     { subject:'Cobertura del Mundial "Fulbito"', room:'p2_videocomu' },
     { subject:'Proyecto de comunicación', room:'p2_videocomu' },
     { subject:'Campaña gráfica y tipografía', room:'p2_videocomu' },
+    { subject:'Cámara Oscura Estenopeica', room:'p2_videocomu' },
 
-    /* --- Lab. Lucas (Informática) --- */
+    /* --- Lab 1 Lucas (Informática) --- */
     { subject:'Presentación', room:'p1_a109', grade:'5° A / 4° C' },
 
     /* --- Biblioteca · cine, videos y teatro (con horarios especificados) --- */
@@ -586,6 +612,8 @@ const REAL_ACTIVITIES = [
     { subject:'Videos de Artes Visuales', room:'pb_biblio', grade:'2° año / 5° año', hora:'9 a 12' },
     { subject:'Obra de Teatro "Reflejos"', room:'pb_biblio', hora:'10:00' },
     { subject:'2da función: Obra de Teatro "Reflejos"', room:'pb_biblio', hora:'11:30' },
+    { subject:'Muestra Anual de los trabajos del taller de Damián Quintana', room:'pb_biblio', grade:'1° B' },
+    { subject:'Muestra Anual de Arte · Cecilia Ayala', room:'pb_biblio' },
 
     /* --- Aula 4° B · Escape Room de ciencias (con horario especificado) --- */
     { subject:'Escape Room: Matemática, Física y Biología', room:'p1_a108', grade:'Desde 3° año', hora:'9 a 12', desc:'2 grupos de 4 alumnos cada uno · destinado a alumnos de 3° año en adelante' }
@@ -625,16 +653,40 @@ const tokensOf = () => norm($('search-input').value.trim()).split(/\s+/).filter(
 function getVisible(ignoreFloor) {
     const tokens = tokensOf();
     const ff = $('filter-floor').value, tf = $('filter-type').value;
+    const fg = $('filter-grade').value;
     return CLASSES.filter(c => {
         if (!ignoreFloor && ff !== 'ALL' && c.floor !== ff) return false;
-        if (tf !== 'ALL' && c.type !== tf) return false;
+        if (tf !== 'ALL' && !roomInDept(ROOMS[c.roomId], tf)) return false;
+        if (fg !== 'ALL' && !gradeHas(c.grade, fg)) return false;
         if (activeRoom && c.roomId !== activeRoom) return false;
         if (tokens.length && !tokens.every(t => c.hay.includes(t))) return false;
         return true;
     });
 }
-const filteringEx = () => !!(tokensOf().length || $('filter-type').value !== 'ALL' || activeRoom);
+const filteringEx = () => !!(tokensOf().length || $('filter-type').value !== 'ALL' || $('filter-grade').value !== 'ALL' || activeRoom);
 const isFiltering = () => filteringEx() || $('filter-floor').value !== 'ALL';
+
+/* Departamentos del filtro de espacios: cada opción agrupa las aulas de una
+   materia. Un valor de la lista puede ser kind de sala ('soc') o id concreto
+   (los dos labs de Informática van por id: comparten el estilo 'comu' de
+   Lab 2 Ariel y así el filtro no arrastra al Taller de Video). */
+const DEPTS = { soc:['soc'], leng:['leng'], arte:['arte'], mate:['mate'], bio:['bio'], edfis:['edfis'], inf:['p1_a109','p2_lab2com'] };
+const DEPT_LABELS = { soc:'Sociales', leng:'Lengua', arte:'Arte', mate:'Matemática', bio:'Biology', edfis:'Ed. Física', inf:'Informática' };
+const roomInDept = (rm, tf) => !!DEPTS[tf] && (DEPTS[tf].includes(rm.k) || DEPTS[tf].includes(rm.id));
+
+/* ¿La actividad (según su campo grade) es relevante para el curso N? Cubre
+   los formatos que carga la escuela: curso suelto ('5° año', '1° B'), listas
+   ('2° año / 5° año'), rangos ('1° a 5° año'), abiertos ('Desde 3° año') y
+   muestras sin curso ('Todos': abiertas a toda la escuela). */
+const gradeHas = (grade, n) => {
+    const g = (grade || 'Todos').toString();
+    if (/todos/i.test(g)) return true;
+    let m = /desde\s*(\d+)/i.exec(g);
+    if (m) return n >= +m[1];
+    m = /(\d+)\s*°?\s*a\s*(\d+)/i.exec(g);
+    if (m) return n >= +m[1] && n <= +m[2];
+    return [...g.matchAll(/(\d+)/g)].some(x => +x[1] === +n);
+};
 
 function computeState() {
     const vis = getVisible(false);
@@ -642,6 +694,7 @@ function computeState() {
     const countsAll = {};
     visAll.forEach(c => countsAll[c.roomId] = (countsAll[c.roomId] || 0) + 1);
     const tokens = tokensOf();
+    const tf = $('filter-type').value;
     const fe = filteringEx();
     const hl = new Set(); const byFloor = { PB: 0, '1P': 0, '2P': 0 };
     if (fe) {
@@ -649,7 +702,7 @@ function computeState() {
             if (!isInter(rm) || rm.k === 'stair') return;
             let hit;
             if (activeRoom) hit = rm.id === activeRoom;
-            else hit = countsAll[rm.id] > 0 || (tokens.length && tokens.every(t => norm(rm.n).includes(t)));
+            else hit = countsAll[rm.id] > 0 || (tokens.length && tokens.every(t => norm(rm.n).includes(t))) || (tf !== 'ALL' && roomInDept(rm, tf));
             if (hit) { hl.add(rm.id); byFloor[rm.floor]++; }
         });
     }
@@ -823,14 +876,14 @@ function renderGrid(state) {
         salas.filter(rm => rm.floor === f).forEach(rm => {
             const items = vis.filter(c => c.roomId === rm.id)
                 .sort((a, b) => (a.horaOrd - b.horaOrd) || a.grade.localeCompare(b.grade) || a.subject.localeCompare(b.subject));
-            if (filtering && !items.length && !nameHit(rm)) return;
+            if (filtering && !items.length && !nameHit(rm) && !roomInDept(rm, $('filter-type').value)) return;
             const st = TYPE_STYLES[SCHED_TYPE[rm.k]] || TYPE_STYLES.Aula;
             const body = items.length
                 ? `<div class="flex flex-wrap gap-1.5">` + items.map(c => {
                     const cs = TYPE_STYLES[c.type] || TYPE_STYLES.Aula;
                     const chip = c.hora
                         ? `<span class="text-[9px] font-semibold text-brand-700 bg-white/70 border border-brand-200 px-1 rounded shrink-0" title="Horario especificado por la escuela"><i class="fa-regular fa-clock mr-0.5"></i>${c.hora} hs</span>`
-                        : `<span class="text-[9px] font-semibold text-amber-600 shrink-0" title="Jornada simultánea: sin horario">Simultánea</span>`;
+                        : `<span class="text-[9px] font-semibold text-amber-600 shrink-0" title="Actividad de todo el día: sin horario">Todo el día</span>`;
                     return `<div data-class-id="${c.id}" class="class-card p-1.5 rounded-lg border ${cs.bg} ${cs.border} cursor-pointer transition-all hover:shadow-md ${activeRoom === c.roomId ? 'ring-2 ring-brand-500' : ''}">
                         <div class="flex items-center justify-between gap-1">
                             <span class="text-[9px] font-bold px-1 rounded ${cs.badge} shrink-0">${c.grade}</span>
@@ -864,6 +917,7 @@ function updateResultsBar(state) {
     const bar = $('results-bar'), none = $('no-results-state');
     const term = $('search-input').value.trim();
     const ff = $('filter-floor').value, tf = $('filter-type').value;
+    const fg = $('filter-grade').value;
     const count = state.vis.length;
     const roomHits = state.hl.size;
     $('clear-search-btn').classList.toggle('hidden', !term);
@@ -877,7 +931,8 @@ function updateResultsBar(state) {
     const tags = [];
     if (term) tags.push(['bg-slate-200 text-slate-700', `"${term}"`]);
     if (ff !== 'ALL') tags.push(['bg-amber-100 text-amber-800', FLOOR_NAME[ff]]);
-    if (tf !== 'ALL') tags.push(['bg-indigo-100 text-indigo-800', tf]);
+    if (tf !== 'ALL') tags.push(['bg-indigo-100 text-indigo-800', DEPT_LABELS[tf] || tf]);
+    if (fg !== 'ALL') tags.push(['bg-emerald-100 text-emerald-700', fg + '° año']);
     if (activeRoom) tags.push(['bg-blue-100 text-blue-800', ROOMS[activeRoom].n]);
     $('active-tag-container').innerHTML = tags.map(([c, t]) => `<span class="${c} px-2 py-0.5 rounded-full">${t}</span>`).join('');
 
@@ -914,7 +969,7 @@ function openClassModal(id) {
     $('modal-course-badge').textContent = `${c.grade} • ${c.floor}`;
     $('modal-subject-title').textContent = c.subject;
     $('modal-room').textContent = `${c.roomName} (${FLOOR_NAME[c.floor]})`;
-    $('modal-schedule').textContent = c.hora ? `${c.day} · ${c.hora} hs (horario especificado)` : `${c.day} · actividad simultánea (sin horario)`;
+    $('modal-schedule').textContent = c.hora ? `${c.day} · ${c.hora} hs (horario especificado)` : `${c.day} · actividad de todo el día (sin horario)`;
     $('modal-desc-row').classList.toggle('hidden', !c.desc);
     $('modal-desc').textContent = c.desc || '';
     const m = $('class-modal'); m.classList.remove('hidden'); setTimeout(() => m.classList.remove('opacity-0'), 10);
@@ -928,10 +983,11 @@ document.addEventListener('DOMContentLoaded', () => {
     $('search-input').addEventListener('input', renderAll);
     $('filter-floor').addEventListener('change', e => { if (e.target.value !== 'ALL') setFloor(e.target.value); else renderAll(); });
     $('filter-type').addEventListener('change', renderAll);
+    $('filter-grade').addEventListener('change', renderAll);
     $('clear-search-btn').addEventListener('click', () => { $('search-input').value = ''; renderAll(); });
 
     const resetAll = () => {
-        $('search-input').value = ''; $('filter-floor').value = 'ALL'; $('filter-type').value = 'ALL';
+        $('search-input').value = ''; $('filter-floor').value = 'ALL'; $('filter-type').value = 'ALL'; $('filter-grade').value = 'ALL';
         activeRoom = null; setFloor('PB');
     };
     $('reset-filters-btn').addEventListener('click', resetAll);
