@@ -479,7 +479,6 @@ PB: {
         r('p2_5barte','5B ARTE',255,805,180,150,'arte'),
         r('p2_5aarte','5A ARTE',440,805,185,150,'arte'),
         /* taller, admin y sanitarios */
-        r('p2_gab','Gabinete',1075,255,80,60,'admin'),
         r('p2_prec','Preceptoría',950,515,70,50,'admin'),
         r('p2_san209','Sanitarios M.',1020,855,110,70,'serv'),
         r('p2_san210','Sanitarios V.',1020,935,110,70,'serv')
@@ -616,7 +615,23 @@ const REAL_ACTIVITIES = [
     { subject:'Muestra Anual de Arte · Cecilia Ayala', room:'pb_biblio' },
 
     /* --- Aula 4° B · Escape Room de ciencias (con horario especificado) --- */
-    { subject:'Escape Room: Matemática, Física y Biología', room:'p1_a108', grade:'Desde 3° año', hora:'9 a 12', desc:'2 grupos de 4 alumnos cada uno · destinado a alumnos de 3° año en adelante' }
+    { subject:'Escape Room: Matemática, Física y Biología', room:'p1_a108', grade:'Desde 3° año', hora:'9 a 12', desc:'2 grupos de 4 alumnos cada uno · destinado a alumnos de 3° año en adelante' },
+
+    /* --- Aula 3° C (ARTE 3C) y Aula 5° B (5B ARTE) · taller --- */
+    { subject:'Reciclado de papel', room:'p1_a103', grade:'3° C' },
+    { subject:'Juego de mesa sobre ESI', room:'p1_a103', grade:'3° C' },
+    { subject:'Fan Cine', room:'p2_5barte', grade:'5° B' },
+
+    /* --- Aulas 5° A / 5° B · instalaciones --- */
+    { subject:'Instalación "Nostalgia"', room:'p2_5aarte', grade:'5° A' },
+    { subject:'Instalación "Huellas"', room:'p2_5barte', grade:'5° B', desc:'Proyecto con 7mo grado' },
+
+    /* --- Aula 4° A · soberanía textil (con trabajo de 7mo grado y 4° B) --- */
+    { subject:'Tarjetones bordados sobre soberanía', room:'p1_soc4a', grade:'4° A' },
+    { subject:'Estampillas de alumnos de 4° B', room:'p1_soc4a', grade:'4° B' },
+
+    /* --- Aula 3° B (ARTE 3B) · instalación de alumnas de 5° B --- */
+    { subject:'Instalación artística sobre redes sociales', room:'p1_a120', grade:'5° B', desc:'Alumnas de 5° B' }
 ];
 
 function buildClasses() {
